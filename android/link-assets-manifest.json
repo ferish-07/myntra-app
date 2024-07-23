@@ -1,0 +1,13 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "src/utils/assets/fonts/index.tsx",
+      "sha1": "05b761cbeb094a190b0d1a2409dd7aafea51a0e4"
+    },
+    {
+      "path": "src/utils/assets/fonts/myntra.ttf",
+      "sha1": "28473a08e30456a73fee1c85668077e6dec9a0ae"
+    }
+  ]
+}
