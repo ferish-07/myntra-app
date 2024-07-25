@@ -7,43 +7,104 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {Fonts} from '../utils/assets/fonts';
+
 const {width} = Dimensions.get('window');
-export default function CustomBottomBar({state, descriptors, navigation}: any) {
+type CustomBarProps = {
+  state: any;
+  descriptors: any;
+  navigation: any;
+};
+export default function CustomBottomBar({
+  state,
+  descriptors,
+  navigation,
+}: CustomBarProps) {
+  console.log(
+    '----Statetttetetetetetetete',
+    typeof state,
+    '---',
+    typeof descriptors,
+    '------>',
+    typeof navigation,
+  );
+  interface Screen {
+    label: string;
+    key?: string;
+    icon: string;
+    isFocused: Boolean;
+    fontFamilyFile: string;
+    navigate: string;
+  }
+  const tabMenuData: Screen[] = [
+    {
+      label: 'Home',
+      icon: 'home',
+      isFocused: true,
+      fontFamilyFile: Fonts.myntra,
+      navigate: 'home',
+    },
+    {
+      label: 'add',
+      icon: 'add',
+      isFocused: false,
+      fontFamilyFile: Fonts.myntra,
+      navigate: 'add',
+    },
+    {
+      label: 'Profile',
+      icon: 'profile',
+      isFocused: false,
+      fontFamilyFile: Fonts.myntra,
+      navigate: 'profile',
+    },
+  ];
+  const [dataSource, setDataSource] = useState<Screen[]>([]);
+  useEffect(() => {
+    tabMenuData.map(screen => {
+      state.routes.map((screen2: any) => {
+        if (screen.label == screen2.name) {
+          console.log('-----------');
+          screen.key = screen2.key;
+        }
+      });
+    });
+    setDataSource(tabMenuData);
+    console.log('---newData', tabMenuData);
+  }, []);
+  const onPress = (route: any) => {
+    let newData = dataSource;
+    newData.map((i: any) => {
+      if (i.key == route.key) {
+        i.isFocused = true;
+      } else {
+        i.isFocused = false;
+      }
+    });
+    setDataSource(newData);
+    const event = navigation.emit({
+      type: 'tabPress',
+      target: route.key,
+    });
+
+    if (!event.defaultPrevented) {
+      navigation.navigate(route.label);
+    }
+  };
   return (
     <View style={styles.mainContainer}>
-      {state.routes.map((route: any, index: number) => {
-        const {options} = descriptors[route.key];
-        const label =
-          options.tabBarLabel !== undefined
-            ? options.tabBarLabel
-            : options.title !== undefined
-            ? options.title
-            : route.name;
-        console.log('-----label', label);
-        const isFocused = state.index === index;
-
-        const onPress = () => {
-          const event = navigation.emit({
-            type: 'tabPress',
-            target: route.key,
-          });
-
-          if (!isFocused && !event.defaultPrevented) {
-            navigation.navigate(route.name);
-          }
-        };
-
+      {dataSource.map((route: any, index: number) => {
         return (
           <View
             key={index}
             style={[
               styles.mainItemContainer,
-              {borderRightWidth: label == 'notes' ? 3 : 0},
+              // {borderRightWidth: label == 'notes' ? 3 : 0},
             ]}>
             {index == 1 ? (
               <TouchableOpacity
+                activeOpacity={0.5}
                 style={{
                   width: 40,
                   height: 40,
@@ -66,12 +127,17 @@ export default function CustomBottomBar({state, descriptors, navigation}: any) {
                     height: 2,
                   },
                   shadowColor: '#000',
-                }}>
-                <Text>F</Text>
+                }}
+                onPress={() => navigation.navigate('AddCategory')}>
+                <Text style={{fontFamily: Fonts.myntra}}>{'add-solid'}</Text>
               </TouchableOpacity>
             ) : (
               <Pressable
-                onPress={onPress}
+                onPress={() => {
+                  if (!route.isFocused) {
+                    onPress(route);
+                  }
+                }}
                 style={{
                   // backgroundColor: isFocused ? '#030D16' : '#182028',
                   // borderRadius: 100,
@@ -89,9 +155,9 @@ export default function CustomBottomBar({state, descriptors, navigation}: any) {
                   <Text
                     style={{
                       fontFamily: Fonts.myntra,
-                      color: isFocused ? 'red' : 'black',
+                      color: route.isFocused ? 'red' : 'black',
                     }}>
-                    {label.toLowerCase()}
+                    {route.label.toLowerCase()}
                   </Text>
                   {/* <NavigationIcon route={label} isFocused={isFocused} /> */}
                 </View>
