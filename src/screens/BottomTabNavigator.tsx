@@ -7,13 +7,14 @@ import {
   View,
 } from 'react-native';
 import React from 'react';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Home from './Home';
 import Profile from './Profile';
 import {Fonts} from '../utils/assets/fonts';
 import CustomBottomBar from './CustomBottomBar';
 import Demo from './Demo';
-import {CurvedBottomBar} from 'react-native-curved-bottom-bar';
+// import {CurvedBottomBar} from 'react-native-curved-bottom-bar';
+import { CurvedBottomBar } from './CurvedBottomTabNavigator';
 import {NavigationContainer} from '@react-navigation/native';
 const Tab = createBottomTabNavigator();
 
@@ -68,7 +69,7 @@ export default function BottomTabNavigator() {
         screenOptions={{unmountOnBlur: true, headerShown: false}}
         renderCircle={({selectedTab, navigate}) => (
           <>
-            {false ? null : (
+            {true ? null : (
               <Animated.View style={styles.btnCircleUp}>
                 <TouchableOpacity
                   style={styles.button}
