@@ -15,7 +15,7 @@ export default function Splash({navigation}: any) {
         justifyContent: 'center',
         alignItems: 'center',
       }}>
-      <Text>Splash</Text>
+      <Text style={{color: 'black'}}>Splash</Text>
     </View>
   );
 }

@@ -9,11 +9,11 @@ import {
   TabRouterOptions,
 } from '@react-navigation/native';
 import React from 'react';
-import { StyleProp, ViewStyle } from 'react-native';
+import {StyleProp, ViewStyle} from 'react-native';
 
 type Enumerate<
   N extends number,
-  Acc extends number[] = []
+  Acc extends number[] = [],
 > = Acc['length'] extends N
   ? Acc[number]
   : Enumerate<N, [...Acc, Acc['length']]>;
@@ -62,6 +62,7 @@ interface Props {
     selectedTab: string;
     navigate: (selectedTab: string) => void;
   }) => JSX.Element;
+  isCurved: Boolean;
 }
 
 export type NavigatorBottomBarProps = DefaultNavigatorOptions<

@@ -36,11 +36,11 @@ export default function Header({title, navigation}: ScreenProps) {
           left: 1,
         }}
         onPress={() => navigation.goBack()}>
-        <Text style={{fontSize: 18, fontFamily: Fonts.myntra}}>
+        <Text style={{fontSize: 18, fontFamily: Fonts.myntra, color: 'black'}}>
           {'arrow-left-solid'}
         </Text>
       </TouchableOpacity>
-      <Text style={{fontSize: 18}}>{title}</Text>
+      <Text style={{fontSize: 18, color: 'black'}}>{title}</Text>
     </View>
   );
 }

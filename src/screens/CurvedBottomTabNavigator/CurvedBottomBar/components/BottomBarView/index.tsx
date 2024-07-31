@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-shadow */
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import React, {
   JSXElementConstructor,
   ReactElement,
@@ -9,21 +9,21 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import { Dimensions, Text, TouchableOpacity, View } from 'react-native';
-import { scale } from 'react-native-size-scaling';
-import { useDeviceOrientation } from '../../../useDeviceOrientation';
-import { getPathDown } from '../../utils/pathDown';
-import { getPathUp } from '../../utils/pathUp';
+import {Dimensions, Text, TouchableOpacity, View} from 'react-native';
+import {scale} from 'react-native-size-scaling';
+import {useDeviceOrientation} from '../../../useDeviceOrientation';
+import {getPathDown} from '../../utils/pathDown';
+import {getPathUp} from '../../utils/pathUp';
 // import { CurvedViewComponent } from '../CurvedView/curvedView';
-import { CurvedViewComponent } from '../CurvedView/curvedView';
-import type { NavigatorBottomBarProps } from './model';
-import { styles } from './styles';
-const { width: maxW } = Dimensions.get('window');
+import {CurvedViewComponent} from '../CurvedView/curvedView';
+import type {NavigatorBottomBarProps} from './model';
+import {styles} from './styles';
+const {width: maxW} = Dimensions.get('window');
 
 const Tab = createBottomTabNavigator();
 
 const BottomBarComponent: (
-  props: NavigatorBottomBarProps
+  props: NavigatorBottomBarProps,
 ) => ReactElement<any, string | JSXElementConstructor<any>> | null =
   React.forwardRef((props, ref) => {
     const {
@@ -39,6 +39,7 @@ const BottomBarComponent: (
       renderCircle,
       borderTopLeftRight = false,
       shadowStyle,
+      isCurved = true,
     } = props;
 
     const [itemLeft, setItemLeft] = useState<any[]>([]);
@@ -49,7 +50,7 @@ const BottomBarComponent: (
     const orientation = useDeviceOrientation();
 
     useImperativeHandle(ref, () => {
-      return { setVisible };
+      return {setVisible};
     });
 
     const setVisible = (visible: boolean) => {
@@ -57,7 +58,7 @@ const BottomBarComponent: (
     };
 
     useEffect(() => {
-      const { width: w } = Dimensions.get('window');
+      const {width: w} = Dimensions.get('window');
       if (!width) {
         setMaxWidth(w);
       }
@@ -67,7 +68,7 @@ const BottomBarComponent: (
       (focusedTab: string, navigate: any) => {
         const getTab = children.filter(
           (e: any) =>
-            e?.props?.position === 'CIRCLE' || e?.props?.position === 'CENTER'
+            e?.props?.position === 'CIRCLE' || e?.props?.position === 'CENTER',
         )[0]?.props?.name;
 
         return renderCircle({
@@ -80,15 +81,15 @@ const BottomBarComponent: (
           },
         });
       },
-      [children, renderCircle]
+      [children, renderCircle],
     );
 
     useEffect(() => {
       const arrLeft: any = children.filter(
-        (item) => item?.props?.position === 'LEFT'
+        item => item?.props?.position === 'LEFT',
       );
       const arrRight: any = children.filter(
-        (item) => item?.props?.position === 'RIGHT'
+        item => item?.props?.position === 'RIGHT',
       );
 
       setItemLeft(arrLeft);
@@ -110,14 +111,16 @@ const BottomBarComponent: (
             getTabbarHeight,
             getCircleWidth,
             borderTopLeftRight,
-            circlePosition
+            circlePosition,
+            isCurved,
           )
         : getPathUp(
             maxWidth,
             getTabbarHeight + 30,
             getCircleWidth,
             borderTopLeftRight,
-            circlePosition
+            circlePosition,
+            isCurved,
           );
     }, [
       borderTopLeftRight,
@@ -128,14 +131,13 @@ const BottomBarComponent: (
       type,
     ]);
 
-    const renderItem = ({ color, routeName, navigate }: any) => {
+    const renderItem = ({color, routeName, navigate}: any) => {
       return (
         <TouchableOpacity
           key={routeName}
           style={styles.itemTab}
-          onPress={() => navigate(routeName)}
-        >
-          <Text style={{ color: color }}>{routeName}</Text>
+          onPress={() => navigate(routeName)}>
+          <Text style={{color: color}}>{routeName}</Text>
         </TouchableOpacity>
       );
     };
@@ -143,7 +145,7 @@ const BottomBarComponent: (
     const _renderTabIcon = useCallback(
       (arr: any[], focusedTab: string, navigation: any) => {
         return (
-          <View style={[styles.rowLeft, { height: scale(getTabbarHeight) }]}>
+          <View style={[styles.rowLeft, {height: scale(getTabbarHeight)}]}>
             {arr.map((item: any, index) => {
               const routeName: string = item?.props?.name;
 
@@ -175,24 +177,24 @@ const BottomBarComponent: (
           </View>
         );
       },
-      [getTabbarHeight, tabBar]
+      [getTabbarHeight, tabBar],
     );
 
     const renderPosition = useCallback(
       (props: any) => {
-        const { state, navigation } = props;
+        const {state, navigation} = props;
         const focusedTab = state?.routes[state.index].name;
 
         if (circlePosition === 'LEFT') {
           return (
             <>
-              <View style={{ marginLeft: scale(getCircleWidth) / 2 }}>
+              <View style={{marginLeft: scale(getCircleWidth) / 2}}>
                 {_renderButtonCenter(focusedTab, navigation.navigate)}
               </View>
               {_renderTabIcon(
                 [...itemLeft, ...itemRight],
                 focusedTab,
-                navigation
+                navigation,
               )}
             </>
           );
@@ -204,9 +206,9 @@ const BottomBarComponent: (
               {_renderTabIcon(
                 [...itemLeft, ...itemRight],
                 focusedTab,
-                navigation
+                navigation,
               )}
-              <View style={{ marginRight: scale(getCircleWidth) / 2 }}>
+              <View style={{marginRight: scale(getCircleWidth) / 2}}>
                 {_renderButtonCenter(focusedTab, navigation.navigate)}
               </View>
             </>
@@ -228,7 +230,7 @@ const BottomBarComponent: (
         getCircleWidth,
         itemLeft,
         itemRight,
-      ]
+      ],
     );
 
     const _renderTabContainer = useCallback(
@@ -237,15 +239,14 @@ const BottomBarComponent: (
           <View
             style={[
               styles.main,
-              { width: maxWidth },
+              {width: maxWidth},
               type === 'UP' && styles.top30,
-            ]}
-          >
+            ]}>
             {renderPosition(props)}
           </View>
         );
       },
-      [maxWidth, renderPosition, type]
+      [maxWidth, renderPosition, type],
     );
 
     const MyTabBar = useCallback(
@@ -279,7 +280,7 @@ const BottomBarComponent: (
         shadowStyle,
         style,
         type,
-      ]
+      ],
     );
 
     const main = useMemo(() => {
@@ -292,9 +293,8 @@ const BottomBarComponent: (
               <Tab.Screen
                 options={e?.props?.options}
                 key={e?.props?.name}
-                name={e?.props?.name}
-              >
-                {(props) => <Component {...props} />}
+                name={e?.props?.name}>
+                {props => <Component {...props} />}
               </Tab.Screen>
             );
           })}

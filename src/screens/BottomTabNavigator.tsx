@@ -6,19 +6,21 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React from 'react';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import React, {useState} from 'react';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Home from './Home';
 import Profile from './Profile';
 import {Fonts} from '../utils/assets/fonts';
 import CustomBottomBar from './CustomBottomBar';
 import Demo from './Demo';
 // import {CurvedBottomBar} from 'react-native-curved-bottom-bar';
-import { CurvedBottomBar } from './CurvedBottomTabNavigator';
+import {CurvedBottomBar} from './CurvedBottomTabNavigator';
 import {NavigationContainer} from '@react-navigation/native';
 const Tab = createBottomTabNavigator();
 
 export default function BottomTabNavigator() {
+  const [isCurved, setIsCurved] = useState(true);
+
   const _renderIcon = (routeName: string, selectedTab: string) => {
     let icon = '';
     let filledIcon: string;
@@ -66,17 +68,23 @@ export default function BottomTabNavigator() {
         bgColor="white"
         initialRouteName="home"
         borderTopLeftRight
+        isCurved={isCurved}
         screenOptions={{unmountOnBlur: true, headerShown: false}}
         renderCircle={({selectedTab, navigate}) => (
           <>
-            {true ? null : (
+            {!isCurved ? null : (
               <Animated.View style={styles.btnCircleUp}>
                 <TouchableOpacity
                   style={styles.button}
                   onPress={() => {
                     navigate('AddCategory');
                   }}>
-                  <Text style={{fontFamily: Fonts.myntra, fontSize: 18}}>
+                  <Text
+                    style={{
+                      fontFamily: Fonts.myntra,
+                      fontSize: 18,
+                      color: 'black',
+                    }}>
                     {'menu'}
                   </Text>
                   {/* <Ionicons name={'apps-sharp'} color="gray" size={25} /> */}
