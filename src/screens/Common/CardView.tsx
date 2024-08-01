@@ -67,7 +67,7 @@ export default function CardView(props: CardViewProps) {
   const [TextInputValue, setTextInputValue] = useState<any>({});
 
   const [values, setValue] = useState<any>({});
-  // const [isFocus, setIsFocus] = useState(false);
+  // const [isFocus, setIsFocus] = usesState(false);
   useEffect(() => {
     let inputArr = [];
     for (let i = 0; i < textInputCount; i++) {
