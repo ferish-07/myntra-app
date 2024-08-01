@@ -120,7 +120,7 @@ const BottomBarComponent: (
             getCircleWidth,
             borderTopLeftRight,
             circlePosition,
-            isCurved,
+            
           );
     }, [
       borderTopLeftRight,
