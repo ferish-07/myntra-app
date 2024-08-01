@@ -11,28 +11,7 @@ import Header from '../Common/Header';
 import CardView from '../Common/CardView';
 import {Dropdown} from 'react-native-element-dropdown';
 export default function AddCategory({navigation}: any) {
-  const [dropdownData, setDropDownData] = useState([
-    {
-      placeholder: 'Select Category',
-      id: 'main_category',
-      data: [
-        {
-          label: 'Mens',
-          value: 'Men',
-        },
-      ],
-    },
-    {
-      placeholder: 'Select Section',
-      id: 'section',
-      data: [],
-    },
-    {
-      placeholder: 'Select Sub Section',
-      id: 'sub_section',
-      data: [],
-    },
-  ]);
+  const [TextInputValue, setTextInputValue] = useState<any>({});
   return (
     <KeyboardAvoidingView
       style={{flex: 1}}
@@ -47,112 +26,14 @@ export default function AddCategory({navigation}: any) {
             title="Add Main Category"
             marginTop={5}
             isTextInput={true}
-            isDropDown={false}
-            dropDownData={dropdownData}
-            placeholder={['Type here..']}
-            textInputCount={1}
-            onSubmitClick={obj => {
-              console.log('-----', obj);
-            }}
-          />
-          <CardView
-            title="Add Section"
-            marginTop={5}
-            isTextInput={true}
             isDropDown={true}
-            dropDownData={dropdownData}
-            placeholder={['Type here..']}
-            textInputCount={1}
-            dropDownCount={2}
-            onSubmitClick={obj => {
-              console.log('-----', obj);
-            }}
-            onDropDownChange={data => {
-              console.log('-------far', data);
-              let newData = dropdownData;
-              if (data.id == 'main_category') {
-                newData[1].data = [
-                  {
-                    label: 'T-shirt',
-                    value: 'T-shirt',
-                  },
-                ];
-              }
-              if (data.id == 'section') {
-                newData[2].data = [
-                  {
-                    label: 'long',
-                    value: 'long',
-                  },
-                  {
-                    label: 'short',
-                    value: 'short',
-                  },
-                ];
-              }
-            }}
-            onDeletePressed={data => console.log('-----datete', data)}
-          />
-          <CardView
-            title="Add Sub Section"
-            marginTop={5}
-            isTextInput={true}
-            isDropDown={true}
-            dropDownData={dropdownData}
-            placeholder={['Type here..']}
-            textInputCount={1}
-            dropDownCount={2}
-            onSubmitClick={obj => {
-              console.log('-----', obj);
-            }}
-            onDropDownChange={data => {
-              console.log('-------far', data);
-              let newData = dropdownData;
-              if (data.id == 'main_category') {
-                newData[1].data = [
-                  {
-                    label: 'T-shirt',
-                    value: 'T-shirt',
-                  },
-                ];
-              }
-              if (data.id == 'section') {
-                newData[2].data = [
-                  {
-                    label: 'long',
-                    value: 'long',
-                  },
-                  {
-                    label: 'short',
-                    value: 'short',
-                  },
-                ];
-              }
-            }}
-            onDeletePressed={data => console.log('-----datete', data)}
-          />
-          <CardView
-            title="Add Brands"
-            marginTop={5}
-            isTextInput={true}
-            isDropDown={false}
-            dropDownData={dropdownData}
-            placeholder={['Type here..']}
-            textInputCount={1}
-            onSubmitClick={obj => {
-              console.log('-----', obj);
-            }}
-          />
-          <CardView
-            title="Add Brands"
-            marginTop={5}
-            isTextInput={true}
-            isDropDown={false}
-            dropDownData={dropdownData}
-            placeholder={['Type here..']}
-            textInputCount={1}
-            onSubmitClick={obj => {
-              console.log('-----', obj);
+            placeholder={['p1', 'p2', 'p3', 'p4', 'p5']}
+            textInputCount={3}
+            onChangeText={setTextInputValue}
+            setTextInputValue={setTextInputValue}
+            TextInputValue={TextInputValue}
+            onSubmitClick={() => {
+              console.log('-----', TextInputValue);
             }}
           />
         </ScrollView>

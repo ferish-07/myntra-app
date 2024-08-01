@@ -8,7 +8,6 @@ import {
   View,
   ViewStyle,
   TouchableOpacity,
-  Dimensions,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {Dropdown} from 'react-native-element-dropdown';
@@ -23,7 +22,7 @@ type Range<F extends number, T extends number> = Exclude<
   Enumerate<T>,
   Enumerate<F>
 >;
-const {width: screenWidth} = Dimensions.get('window');
+
 interface CardViewProps {
   title: string;
   cardStyle?: StyleProp<ViewStyle>;
@@ -34,15 +33,11 @@ interface CardViewProps {
   buttonView?: Boolean;
   isSaveButton?: Boolean;
   textInputCount?: number;
-  // onChangeText: (obj: object) => void;
-  // TextInputValue: any;
-  // setTextInputValue: React.Dispatch<React.SetStateAction<any>>;
-  onDropDownChange?: ({id}: {id: string}) => void;
-  onSubmitClick: ({}: {}) => void;
-  onDeletePressed?: ({}: {}) => void;
+  onChangeText: (obj: object) => void;
+  TextInputValue: any;
+  setTextInputValue: React.Dispatch<React.SetStateAction<any>>;
+  onSubmitClick: () => void;
   isDropDown: Boolean;
-  dropDownCount?: number;
-  dropDownData: any;
 }
 
 export default function CardView(props: CardViewProps) {
@@ -56,18 +51,25 @@ export default function CardView(props: CardViewProps) {
     buttonView = true,
     isSaveButton = true,
     textInputCount = 1,
+    onChangeText,
+    TextInputValue,
+    setTextInputValue,
     onSubmitClick,
     isDropDown,
-    dropDownCount = 1,
-    dropDownData,
-    onDropDownChange = () => {},
-    onDeletePressed = () => {},
   } = props;
   const [listTextInput, setListTextInput] = useState<any[]>([]);
-  const [TextInputValue, setTextInputValue] = useState<any>({});
-
-  const [values, setValue] = useState<any>({});
-  // const [isFocus, setIsFocus] = useState(false);
+  const data = [
+    {label: 'Item 1', value: '1'},
+    {label: 'Item 2', value: '2'},
+    {label: 'Item 3', value: '3'},
+    {label: 'Item 4', value: '4'},
+    {label: 'Item 5', value: '5'},
+    {label: 'Item 6', value: '6'},
+    {label: 'Item 7', value: '7'},
+    {label: 'Item 8', value: '8'},
+  ];
+  const [values, setValue] = useState(null);
+  const [isFocus, setIsFocus] = useState(false);
   useEffect(() => {
     let inputArr = [];
     for (let i = 0; i < textInputCount; i++) {
@@ -110,8 +112,8 @@ export default function CardView(props: CardViewProps) {
                 <TextInput
                   style={{
                     backgroundColor: '#F0F0F0',
-                    padding: Platform.OS == 'android' ? 5 : 8,
-                    width: '100%',
+                    padding: Platform.OS == 'android' ? 0 : 8,
+                    width: '80%',
                     marginTop: 8,
                     borderRadius: 5,
                     paddingHorizontal: 8,
@@ -124,7 +126,7 @@ export default function CardView(props: CardViewProps) {
                       ...TextInputValue,
                       [`${index}`]: text,
                     };
-                    setTextInputValue(newObj);
+                    onChangeText(newObj);
                   }}
                   placeholderTextColor={'lightgrey'}
                 />
@@ -132,103 +134,58 @@ export default function CardView(props: CardViewProps) {
             })
           : null}
         {isDropDown ? (
-          <View
-            style={{
-              flexDirection: 'row',
-              flexWrap: 'wrap',
-              // justifyContent: 'space-',
-              // margin: 5,
-              // width: '80%',
-            }}>
-            {Array(dropDownCount)
-              .fill('')
-              .map((i, index) => {
-                return (
-                  <Dropdown
-                    disable={dropDownData[index].data.length == 0}
-                    style={[
-                      styles.dropdown,
-                      // isFocus && {borderColor: 'blue'},
-                      {
-                        marginLeft: index == 1 ? 6 : 0,
-                        marginTop: 5,
-                      },
-                    ]}
-                    dropdownPosition="auto"
-                    placeholderStyle={styles.placeholderStyle} // Dropdown placholder Styling when item is not selected
-                    selectedTextStyle={styles.selectedTextStyle} // text when Select Value on Dropdown
-                    inputSearchStyle={styles.inputSearchStyle} //search Bar Styling
-                    iconStyle={styles.iconStyle}
-                    data={dropDownData[index].data}
-                    search
-                    maxHeight={300}
-                    labelField="label"
-                    valueField="value"
-                    placeholder={dropDownData[index].placeholder}
-                    searchPlaceholder="Search..."
-                    value={values[index]}
-                    // onFocus={() => setIsFocus(true)}
-                    // onBlur={() => setIsFocus(false)}
-                    onChange={item => {
-                      let value = {
-                        ...values,
-                        [index]: item.value,
-                        [dropDownData[index].id]: item.value,
-                      };
-                      setValue(value);
-                      onDropDownChange({...item, id: dropDownData[index].id});
-                      // setIsFocus(false);
-                    }}
-                    containerStyle={{
-                      borderBottomLeftRadius: 10,
-                      borderBottomRightRadius: 10,
-                      // width: screenWidth * 0.8,
-                      // left: 204,
-
-                      // left: null,
-                    }} //Below Container Size Where all list and Search bar is present
-                    itemContainerStyle={{
-                      borderBottomLeftRadius: 10,
-                      borderBottomRightRadius: 10,
-                    }}
-                    renderItem={item => {
-                      return (
-                        <View
-                          style={{
-                            backgroundColor:
-                              values[index] == item.value ? '#F6F7F8' : 'white',
-                            padding: 17,
-                            flexDirection: 'row',
-                            justifyContent: 'space-between',
-                          }}>
-                          <Text style={{fontSize: 16}}>{item.label}</Text>
-                          <TouchableOpacity
-                            style={{
-                              // backgroundColor: 'white',
-                              width: '15%',
-                              justifyContent: 'center',
-                              alignItems: 'center',
-                            }}
-                            onPress={() =>
-                              onDeletePressed(
-                                dropDownData[index].data[item._index],
-                              )
-                            }>
-                            <Text style={{fontSize: 15}}>{'D'}</Text>
-                          </TouchableOpacity>
-                        </View>
-                      );
-                    }}
-                  />
-                );
-              })}
-          </View>
+          <Dropdown
+            style={[styles.dropdown, isFocus && {borderColor: 'blue'}]}
+            placeholderStyle={styles.placeholderStyle}
+            selectedTextStyle={styles.selectedTextStyle}
+            inputSearchStyle={styles.inputSearchStyle}
+            iconStyle={styles.iconStyle}
+            data={data}
+            search
+            maxHeight={300}
+            labelField="label"
+            valueField="value"
+            placeholder={!isFocus ? 'Select item' : '...'}
+            searchPlaceholder="Search..."
+            value={values}
+            onFocus={() => setIsFocus(true)}
+            onBlur={() => setIsFocus(false)}
+            onChange={item => {
+              setValue(item.value);
+              setIsFocus(false);
+            }}
+            renderItem={({label, value}) => {
+              // console.log('selected', selected);
+              return (
+                <View
+                  style={{
+                    backgroundColor: values == value ? 'red' : 'white',
+                    padding: 17,
+                  }}>
+                  <Text style={{fontSize: 16}}>{label}</Text>
+                </View>
+              );
+            }}
+            // renderRightIcon={() => (
+            //   <View>
+            //     <Text>D</Text>
+            //   </View>
+            // )}
+            // renderLeftIcon={() => (
+            //   <View>
+            //     <Text>l</Text>
+            //   </View>
+            // )}
+            // itemContainerStyle={{backgroundColor: 'red'}}
+            // containerStyle={{backgroundColor: 'yellow', width: '50%'}}
+            // dropdownPosition=''
+          />
         ) : null}
         {buttonView ? (
           <View
             style={{
               marginTop: 10,
-              width: '100%',
+              width: '80%',
               flexDirection: 'row',
               justifyContent: 'flex-end',
             }}>
@@ -250,10 +207,7 @@ export default function CardView(props: CardViewProps) {
                   shadowOpacity: 0.2,
                   shadowRadius: 1.41,
                 }}
-                onPress={() => {
-                  setTextInputValue({});
-                  setValue({});
-                }}>
+                onPress={() => setTextInputValue({})}>
                 <Text style={{color: 'black', fontSize: 16}}>Reset</Text>
               </TouchableOpacity>
             ) : null}
@@ -276,9 +230,7 @@ export default function CardView(props: CardViewProps) {
                   shadowRadius: 1.41,
                   marginLeft: 8,
                 }}
-                onPress={() =>
-                  onSubmitClick({TextInputValue, dropDownValues: values})
-                }>
+                onPress={() => onSubmitClick()}>
                 <Text style={{color: 'white', fontSize: 16}}>Save</Text>
               </TouchableOpacity>
             ) : null}
@@ -295,13 +247,12 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   dropdown: {
-    height: 40,
+    height: 50,
     borderColor: 'gray',
     borderWidth: 0.5,
     borderRadius: 8,
     paddingHorizontal: 8,
-    width: '48%',
-    // flex: 1,
+    width: '50%',
   },
   icon: {
     marginRight: 5,

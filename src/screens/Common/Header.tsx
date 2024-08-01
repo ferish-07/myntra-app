@@ -25,7 +25,7 @@ export default function Header({title, navigation}: ScreenProps) {
           height: 2,
         },
         shadowColor: '#000',
-        padding: 10,
+        padding: 5,
         flexDirection: 'row',
       }}>
       <TouchableOpacity
