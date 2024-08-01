@@ -23,7 +23,7 @@ export default function BottomTabNavigator() {
 
   const _renderIcon = (routeName: string, selectedTab: string) => {
     let icon = '';
-    let filledIcon: string;
+    let filledIcon = '';
 
     switch (routeName) {
       case 'Home':

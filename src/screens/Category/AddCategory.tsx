@@ -1,37 +1,44 @@
-import {ScrollView, StyleSheet, Text, View} from 'react-native';
-import React from 'react';
+import {
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
+import React, {useState} from 'react';
 import Header from '../Common/Header';
 import CardView from '../Common/CardView';
-
+import {Dropdown} from 'react-native-element-dropdown';
 export default function AddCategory({navigation}: any) {
+  const [TextInputValue, setTextInputValue] = useState<any>({});
   return (
-    <View style={{flex: 1, backgroundColor: 'white'}}>
-      <Header title={'Manage Category'} navigation={navigation} />
-      <ScrollView style={{height: '98%'}}>
-        <CardView
-          title="Add Main Category"
-          cardStyle={{
-            backgroundColor: 'white',
-            width: '80%',
-            elevation: 2,
-            borderRadius: 5,
-            alignItems: 'center',
-            // height: 40,
-            shadowColor: '#000',
-            shadowOffset: {
-              width: 0,
-              height: 1,
-            },
-            shadowOpacity: 0.2,
-            shadowRadius: 1.41,
-            padding: 8,
-          }}
-          marginTop={10}
-          isTextInput={true}
-          placeholder="Type Category here..."
-        />
-      </ScrollView>
-    </View>
+    <KeyboardAvoidingView
+      style={{flex: 1}}
+      behavior={Platform.OS == 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS == 'ios' ? 80 : 0}>
+      <View style={{flex: 1, backgroundColor: 'white'}}>
+        <Header title={'Manage Category'} navigation={navigation} />
+        <ScrollView
+          style={{height: '98%', marginTop: 1}}
+          keyboardShouldPersistTaps={'always'}>
+          <CardView
+            title="Add Main Category"
+            marginTop={5}
+            isTextInput={true}
+            isDropDown={true}
+            placeholder={['p1', 'p2', 'p3', 'p4', 'p5']}
+            textInputCount={3}
+            onChangeText={setTextInputValue}
+            setTextInputValue={setTextInputValue}
+            TextInputValue={TextInputValue}
+            onSubmitClick={() => {
+              console.log('-----', TextInputValue);
+            }}
+          />
+        </ScrollView>
+      </View>
+    </KeyboardAvoidingView>
   );
 }
 
