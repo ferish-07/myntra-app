@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {Dropdown} from 'react-native-element-dropdown';
+import {Fonts} from '../../utils/assets/fonts';
 type Enumerate<
   N extends number,
   Acc extends number[] = [],
@@ -214,7 +215,10 @@ export default function CardView(props: CardViewProps) {
                                 dropDownData[index].data[item._index],
                               )
                             }>
-                            <Text style={{fontSize: 15}}>{'D'}</Text>
+                            <Text
+                              style={{fontSize: 15, fontFamily: Fonts.myntra}}>
+                              {'delete-filled'}
+                            </Text>
                           </TouchableOpacity>
                         </View>
                       );
