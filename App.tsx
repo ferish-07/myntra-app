@@ -26,6 +26,7 @@ import {
 } from 'react-native/Libraries/NewAppScreen';
 import Login from './src/screens/Login';
 import Router from './src/screens/Router';
+import Demo from './src/screens/Demo';
 
 type SectionProps = PropsWithChildren<{
   title: string;

@@ -107,7 +107,7 @@ export default function FloatingTextInput(props: FloatingTextInput) {
   const labelDynamicStyles = {
     fontSize: fontSizeAnimation,
     color: fontColorAnimation,
-    backgroundColor: isFocused ? 'white' : 'white', // input style for second floating label version
+    backgroundColor: 'white',
     transform: [
       {
         translateY: translateY,

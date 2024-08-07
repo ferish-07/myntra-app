@@ -19,7 +19,7 @@ import {NavigationContainer} from '@react-navigation/native';
 const Tab = createBottomTabNavigator();
 
 export default function BottomTabNavigator() {
-  const [isCurved, setIsCurved] = useState(true);
+  const [isCurved, setIsCurved] = useState(false);
 
   const _renderIcon = (routeName: string, selectedTab: string) => {
     let icon = '';
