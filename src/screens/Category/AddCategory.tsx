@@ -33,6 +33,9 @@ export default function AddCategory({navigation}: any) {
       data: [],
     },
   ]);
+  const [value, setValue] = useState<any>(null);
+  const [newValue, setNewValue] = useState<any>(null);
+  // const [newValue, setValue] = useState<any>(null);
   return (
     <KeyboardAvoidingView
       style={{flex: 1}}
@@ -44,18 +47,94 @@ export default function AddCategory({navigation}: any) {
           style={{height: '98%', marginTop: 1}}
           keyboardShouldPersistTaps={'always'}>
           <CardView
-            title="Add Main Category"
+            title="Demo"
             marginTop={5}
             isTextInput={true}
             isDropDown={false}
             dropDownData={dropdownData}
-            placeholder={['Type here..']}
-            textInputCount={1}
+            placeholder={['Id', 'Category']}
+            textInputCount={2}
             onSubmitClick={obj => {
               console.log('-----', obj);
+              setNewValue(obj);
             }}
           />
           <CardView
+            title="USER DETAILS"
+            marginTop={5}
+            isTextInput={true}
+            isDropDown={false}
+            dropDownData={dropdownData}
+            placeholder={[
+              'First Name',
+              'Last Name',
+              'Email',
+              'Contact Number',
+              'Password',
+            ]}
+            textInputCount={5}
+            onSubmitClick={obj => {
+              console.log('-----', obj);
+              setValue(obj);
+            }}
+          />
+          <View
+            style={{
+              // width: '90%',
+              // backgroundColor: 'red',
+              // alignSelf: 'center',
+              marginTop: 10,
+              flexDirection: 'row',
+              justifyContent: 'space-around',
+              flex: 1,
+            }}>
+            {newValue ? (
+              <View style={{borderRadius: 10, borderWidth: 1, padding: 10}}>
+                <View>
+                  <Text style={{fontWeight: 'bold'}}>DEMO CARD VALUE</Text>
+                </View>
+                {['Id', 'Category'].map((i, index) => {
+                  return (
+                    <View>
+                      {newValue ? (
+                        <>
+                          <Text>{`    ${i} - ${newValue?.TextInputValue[index]}`}</Text>
+                        </>
+                      ) : null}
+                    </View>
+                  );
+                })}
+              </View>
+            ) : null}
+
+            {value ? (
+              <View style={{borderRadius: 10, borderWidth: 1, padding: 10}}>
+                <View>
+                  <Text style={{fontWeight: 'bold'}}>
+                    USER DETAILS CARD VALUE
+                  </Text>
+                </View>
+                {[
+                  'First Name',
+                  'Last Name',
+                  'Email',
+                  'Contact Number',
+                  'Password',
+                ].map((i, index) => {
+                  return (
+                    <View>
+                      {value ? (
+                        <>
+                          <Text>{`   ${i} - ${value?.TextInputValue[index]}`}</Text>
+                        </>
+                      ) : null}
+                    </View>
+                  );
+                })}
+              </View>
+            ) : null}
+          </View>
+          {/* <CardView
             title="Add Section"
             marginTop={5}
             isTextInput={true}
@@ -154,7 +233,7 @@ export default function AddCategory({navigation}: any) {
             onSubmitClick={obj => {
               console.log('-----', obj);
             }}
-          />
+          /> */}
         </ScrollView>
       </View>
     </KeyboardAvoidingView>

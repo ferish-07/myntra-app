@@ -20,11 +20,11 @@ interface LoginModalProps {
 }
 export default function LoginModal(props: LoginModalProps) {
   const {modalIsVisible = false, onClose} = props;
-  const LoginOpacity = useRef(new Animated.Value(1)).current;
-  const RegistrationOpacity = useRef(new Animated.Value(0)).current;
+  const fadeAnim = useRef(new Animated.Value(1)).current;
 
   const [isRegister, setIsRegister] = useState<boolean>(false);
   const scaleValue = useRef(new Animated.Value(1)).current;
+  const scaleValueFacebook = useRef(new Animated.Value(1)).current;
   const scaleValueLogin = useRef(new Animated.Value(1)).current;
   const scaleValueRegis = useRef(new Animated.Value(1)).current;
 
@@ -43,7 +43,7 @@ export default function LoginModal(props: LoginModalProps) {
   };
   const RegistrationComponent = () => {
     return (
-      <Animated.View style={{opacity: RegistrationOpacity}}>
+      <>
         <FloatingTextInput label="Full Name" />
         <FloatingTextInput label="Email/Mobile Number" />
         <FloatingTextInput label="Password" secureTextEntry={true} />
@@ -60,17 +60,47 @@ export default function LoginModal(props: LoginModalProps) {
             <Text style={styles.buttonText}>Create Account</Text>
           </Animated.View>
         </Pressable>
-      </Animated.View>
+      </>
     );
   };
+  const onLoginPress = (loginCred: any) => {
+    console.log('------->>>', loginCred);
+    let reg = /^\d+$/;
+    console.log(reg.test(loginCred.cred));
+    const payload = {
+      [reg.test(loginCred.cred) ? 'contact_number' : 'email']: loginCred.cred,
+      password: loginCred.password,
+    };
+    console.log('--payload', payload);
+  };
+
   const LoginComponent = () => {
+    const [loginCred, setLoginCred] = useState<object>({});
     return (
-      <Animated.View style={{opacity: LoginOpacity}}>
-        <FloatingTextInput label="Email/Mobile Number" />
-        <FloatingTextInput label="Password" secureTextEntry={true} />
+      <>
+        <FloatingTextInput
+          label="Email/Mobile Number"
+          onChangeText={data => {
+            let newObj = {...loginCred, ['cred']: data};
+            console.log('-----', newObj);
+            setLoginCred(newObj);
+          }}
+        />
+        <FloatingTextInput
+          label="Password"
+          secureTextEntry={true}
+          onChangeText={data => {
+            let newObj = {...loginCred, ['password']: data};
+            console.log('---ee--', newObj);
+            setLoginCred(newObj);
+          }}
+        />
         <Pressable
           onPressIn={() => onPressIn(scaleValueLogin)}
-          onPressOut={() => onPressOut(scaleValueLogin)}>
+          onPressOut={() => onPressOut(scaleValueLogin)}
+          onPress={() => {
+            onLoginPress(loginCred);
+          }}>
           <Animated.View
             style={[
               styles.buttonContent,
@@ -80,7 +110,7 @@ export default function LoginModal(props: LoginModalProps) {
             <Text style={styles.buttonText}>Login...</Text>
           </Animated.View>
         </Pressable>
-      </Animated.View>
+      </>
     );
   };
   const SocialMediaLogin = () => {
@@ -114,24 +144,50 @@ export default function LoginModal(props: LoginModalProps) {
             </Text>
           </View>
         </TouchableOpacity>
+        <TouchableOpacity
+          activeOpacity={1}
+          style={{
+            flexDirection: 'row',
+            backgroundColor: 'white',
+            alignItems: 'center',
+            borderWidth: 1,
+            borderRadius: 10,
+            padding: 10,
+            borderColor: 'gray',
+            marginTop: 10,
+            transform: [{scale: scaleValueFacebook}],
+          }}
+          onPressIn={() => onPressIn(scaleValueFacebook)}
+          onPressOut={() => onPressOut(scaleValueFacebook)}>
+          <Image
+            source={{
+              uri: 'https://cdn1.iconfinder.com/data/icons/logotypes/32/square-facebook-512.png',
+            }}
+            style={{width: 20, height: 20}}
+            resizeMode="contain"
+          />
+          <View style={{marginLeft: 5}}>
+            <Text style={{fontSize: 16}}>
+              {isRegister ? 'Sign in using Facebook' : 'Log in using Facebook'}
+            </Text>
+          </View>
+        </TouchableOpacity>
       </View>
     );
   };
   const toggleVisibility = () => {
-    const toValue = isRegister ? 1 : 0;
-    const fromValue = isRegister ? 0 : 1;
-    Animated.parallel([
-      Animated.timing(RegistrationOpacity, {
-        toValue,
-        duration: 300,
+    Animated.timing(fadeAnim, {
+      toValue: 0,
+      duration: 200,
+      useNativeDriver: true,
+    }).start(() => {
+      setIsRegister(!isRegister);
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 200,
         useNativeDriver: true,
-      }),
-      Animated.timing(LoginOpacity, {
-        toValue: fromValue,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-    ]).start(() => setIsRegister(!isRegister));
+      }).start();
+    });
   };
   return (
     <Modal
@@ -161,7 +217,9 @@ export default function LoginModal(props: LoginModalProps) {
           <Text style={{fontSize: 18}}>Log in or sign up</Text>
         </View>
         <ScrollView style={{flex: 1, padding: 15}}>
-          {isRegister ? <RegistrationComponent /> : <LoginComponent />}
+          <Animated.View style={{opacity: fadeAnim}}>
+            {isRegister ? <RegistrationComponent /> : <LoginComponent />}
+          </Animated.View>
           <View
             style={{
               marginTop: 10,
