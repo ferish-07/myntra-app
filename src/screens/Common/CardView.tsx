@@ -120,7 +120,6 @@ export default function CardView(props: CardViewProps) {
                   placeholder={placeholder[index]}
                   value={TextInputValue[`${index}`]}
                   onChangeText={text => {
-                    let newObj1 = {};
                     let newObj = {
                       ...TextInputValue,
                       [`${index}`]: text,

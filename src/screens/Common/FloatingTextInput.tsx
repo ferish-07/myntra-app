@@ -30,6 +30,7 @@ interface FloatingTextInput {
   keyboardType?: 'email-address' | 'default' | 'number-pad';
   label: string;
   secureTextEntry?: boolean;
+  onChangeText: (string: string) => void;
 }
 export default function FloatingTextInput(props: FloatingTextInput) {
   const {
@@ -38,6 +39,7 @@ export default function FloatingTextInput(props: FloatingTextInput) {
     keyboardType = 'default',
     label = 'LABEL',
     secureTextEntry = false,
+    onChangeText,
   } = props;
   const [isFocused, setIsFocused] = useState(false);
   const [inputLayout, setInputLayout] = useState<Layout>(initialLayout);
@@ -130,7 +132,10 @@ export default function FloatingTextInput(props: FloatingTextInput) {
         secureTextEntry={secureTextEntry}
         keyboardType={keyboardType}
         value={textInputValue}
-        onChangeText={setTextInputValue}
+        onChangeText={text => {
+          onChangeText(text);
+          setTextInputValue(text);
+        }}
         autoCorrect={false}
         autoCapitalize="none"
         onFocus={onTextInputFocus}
