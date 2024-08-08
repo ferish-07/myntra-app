@@ -18,7 +18,7 @@ import {CurvedBottomBar} from './CurvedBottomTabNavigator';
 import {NavigationContainer} from '@react-navigation/native';
 const Tab = createBottomTabNavigator();
 
-export default function BottomTabNavigator() {
+export default function BottomTabNavigator({navigation}: any) {
   const [isCurved, setIsCurved] = useState(true);
 
   const _renderIcon = (routeName: string, selectedTab: string) => {
@@ -101,7 +101,7 @@ export default function BottomTabNavigator() {
         />
         <CurvedBottomBar.Screen
           name="Profile"
-          component={() => <Profile />}
+          component={() => <Profile navigation={navigation} />}
           position="RIGHT"
         />
       </CurvedBottomBar.Navigator>

@@ -15,9 +15,9 @@ import {Fonts, Images} from '../utils/assets/fonts';
 import {SvgXml} from 'react-native-svg';
 import LoginModal from './Common/LoginModal';
 import Header from './Common/Header';
-export default function Profile() {
+export default function Profile({navigation}: any) {
   const [modalVisible, setModalVisible] = useState<boolean>(false);
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(true);
 
   useEffect(() => {
     console.log('----in profile tab');
@@ -30,75 +30,77 @@ export default function Profile() {
   //   );
   // };
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
-      {isLoggedIn ? (
-        <>
-          <View style={{alignItems: 'center', marginTop: 10}}>
-            <Image
-              source={Images.myprofile}
-              style={{width: 100, height: 100, borderRadius: 100}}
-            />
-            <TouchableOpacity
-              activeOpacity={1}
-              style={{
-                backgroundColor: 'white',
-                borderRadius: 100,
-                height: 20,
-                width: 20,
-                position: 'absolute',
-                bottom: 8,
-                right: 150,
-                justifyContent: 'center',
-                alignItems: 'center',
-                shadowColor: '#DDDDDD',
-                shadowOffset: {
-                  width: 0,
-                  height: 0,
-                },
-                shadowOpacity: 1,
-                shadowRadius: 5,
-                elevation: 1,
-              }}>
-              <Text style={{fontFamily: Fonts.myntra}}>{'edit'}</Text>
-            </TouchableOpacity>
-          </View>
-          <View style={{marginTop: 10, alignItems: 'center'}}>
-            <Text style={{fontWeight: '800', fontSize: 18}}>Ferish Modi</Text>
-            <Text style={{color: 'gray', fontSize: 16}}>
-              modiferish@gmail.com
-            </Text>
-          </View>
-        </>
-      ) : (
-        <>
-          <View style={{margin: 10, marginHorizontal: 30}}>
-            <Text style={{fontWeight: '500', fontSize: 22, letterSpacing: 1}}>
-              Profile
-            </Text>
-            <Text style={{fontSize: 18, marginTop: 10}}>
-              Unlock Your Personalized Shopping Experience
-            </Text>
-            <TouchableOpacity
-              style={{
-                backgroundColor: '#ff3f6c',
-                // width: '50%',
-                padding: 10,
-                borderRadius: 8,
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginTop: 15,
-              }}
-              onPress={() => {
-                setModalVisible(true);
-              }}>
-              <Text style={{color: 'white', fontWeight: '700', fontSize: 18}}>
-                LOGIN
+    <SafeAreaView style={{backgroundColor: 'white', flex: 1}}>
+      <View style={{backgroundColor: 'white', marginTop: 45}}>
+        {isLoggedIn ? (
+          <>
+            <View style={{alignItems: 'center', marginTop: 10}}>
+              <Image
+                source={Images.myprofile}
+                style={{width: 100, height: 100, borderRadius: 100}}
+              />
+              <TouchableOpacity
+                activeOpacity={1}
+                style={{
+                  backgroundColor: 'white',
+                  borderRadius: 100,
+                  height: 20,
+                  width: 20,
+                  position: 'absolute',
+                  bottom: 8,
+                  right: 150,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  shadowColor: '#DDDDDD',
+                  shadowOffset: {
+                    width: 0,
+                    height: 0,
+                  },
+                  shadowOpacity: 1,
+                  shadowRadius: 5,
+                  elevation: 1,
+                }}>
+                <Text style={{fontFamily: Fonts.myntra}}>{'edit'}</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={{marginTop: 10, alignItems: 'center'}}>
+              <Text style={{fontWeight: '800', fontSize: 18}}>Ferish Modi</Text>
+              <Text style={{color: 'gray', fontSize: 16}}>
+                modiferish@gmail.com
               </Text>
-            </TouchableOpacity>
-          </View>
-        </>
-      )}
-      <View style={{flex: 1, margin: 10, marginHorizontal: 30}}>
+            </View>
+          </>
+        ) : (
+          <>
+            <View style={{margin: 10, marginHorizontal: 30}}>
+              <Text style={{fontWeight: '500', fontSize: 22, letterSpacing: 1}}>
+                Profile
+              </Text>
+              <Text style={{fontSize: 18, marginTop: 10}}>
+                Unlock Your Personalized Shopping Experience
+              </Text>
+              <TouchableOpacity
+                style={{
+                  backgroundColor: '#ff3f6c',
+                  // width: '50%',
+                  padding: 10,
+                  borderRadius: 8,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  marginTop: 15,
+                }}
+                onPress={() => {
+                  setModalVisible(true);
+                }}>
+                <Text style={{color: 'white', fontWeight: '700', fontSize: 18}}>
+                  LOGIN
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </>
+        )}
+      </View>
+      <View style={{margin: 10, marginHorizontal: 30}}>
         <TouchableOpacity
           style={{
             // width: '90%',
@@ -109,7 +111,10 @@ export default function Profile() {
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-between',
-          }}>
+          }}
+          onPress={() =>
+            navigation.navigate('Orders', {isLoggedIn: isLoggedIn})
+          }>
           <View
             style={{
               flexDirection: 'row',
