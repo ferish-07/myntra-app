@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  Vibration,
   View,
 } from 'react-native';
 import React, {useRef, useState} from 'react';
@@ -195,7 +196,11 @@ export default function LoginModal(props: LoginModalProps) {
       style={{margin: 0, justifyContent: 'flex-end'}}
       avoidKeyboard={true}
       swipeDirection="down"
-      onSwipeComplete={() => onClose()}
+      onSwipeComplete={() => {
+        Vibration.vibrate(100);
+
+        onClose();
+      }}
       onBackdropPress={() => onClose()}>
       <View
         style={{
