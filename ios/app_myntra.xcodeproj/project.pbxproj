@@ -12,11 +12,11 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		3A2A8A9FD9074AB4B09F4F5D /* myntra.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FA27BBC3FB2D48AE8D616BCD /* myntra.ttf */; };
 		7699B88040F8A987B510C191 /* libPods-app_myntra-app_myntraTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 19F6CBCC0A4E27FBF8BF4A61 /* libPods-app_myntra-app_myntraTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
-		98A0F0D02AED4B1D8CAB194D /* index.tsx in Resources */ = {isa = PBXBuildFile; fileRef = 81C3954E01BF401481D2BD25 /* index.tsx */; };
 		DC874DB067E30521BB22B7E1 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = FCCC302A22509F8B04D729E4 /* PrivacyInfo.xcprivacy */; };
+		C924CB2E9A764FCFA7024177 /* index.tsx in Resources */ = {isa = PBXBuildFile; fileRef = 08D0D68A06E84ED2AF3DE2AF /* index.tsx */; };
+		13E247465D1C4F0FADA3F065 /* myntra.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 36C3C8BFBE304E3D9B8F8ADD /* myntra.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -46,11 +46,11 @@
 		5B7EB9410499542E8C5724F5 /* Pods-app_myntra-app_myntraTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-app_myntra-app_myntraTests.debug.xcconfig"; path = "Target Support Files/Pods-app_myntra-app_myntraTests/Pods-app_myntra-app_myntraTests.debug.xcconfig"; sourceTree = "<group>"; };
 		5DCACB8F33CDC322A6C60F78 /* libPods-app_myntra.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-app_myntra.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = app_myntra/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		81C3954E01BF401481D2BD25 /* index.tsx */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = index.tsx; path = ../src/utils/assets/fonts/index.tsx; sourceTree = "<group>"; };
 		89C6BE57DB24E9ADA2F236DE /* Pods-app_myntra-app_myntraTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-app_myntra-app_myntraTests.release.xcconfig"; path = "Target Support Files/Pods-app_myntra-app_myntraTests/Pods-app_myntra-app_myntraTests.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
-		FA27BBC3FB2D48AE8D616BCD /* myntra.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = myntra.ttf; path = ../src/utils/assets/fonts/myntra.ttf; sourceTree = "<group>"; };
 		FCCC302A22509F8B04D729E4 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = app_myntra/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		08D0D68A06E84ED2AF3DE2AF /* index.tsx */ = {isa = PBXFileReference; name = "index.tsx"; path = "../src/utils/assets/fonts/index.tsx"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		36C3C8BFBE304E3D9B8F8ADD /* myntra.ttf */ = {isa = PBXFileReference; name = "myntra.ttf"; path = "../src/utils/assets/fonts/myntra.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -108,8 +108,8 @@
 		1CAE13A1B87E41729D4091A1 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				81C3954E01BF401481D2BD25 /* index.tsx */,
-				FA27BBC3FB2D48AE8D616BCD /* myntra.ttf */,
+				08D0D68A06E84ED2AF3DE2AF /* index.tsx */,
+				36C3C8BFBE304E3D9B8F8ADD /* myntra.ttf */,
 			);
 			name = Resources;
 			path = "";
@@ -264,8 +264,8 @@
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				DC874DB067E30521BB22B7E1 /* PrivacyInfo.xcprivacy in Resources */,
-				98A0F0D02AED4B1D8CAB194D /* index.tsx in Resources */,
-				3A2A8A9FD9074AB4B09F4F5D /* myntra.ttf in Resources */,
+				C924CB2E9A764FCFA7024177 /* index.tsx in Resources */,
+				13E247465D1C4F0FADA3F065 /* myntra.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

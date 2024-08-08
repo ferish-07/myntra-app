@@ -3,11 +3,11 @@
   "data": [
     {
       "path": "src/utils/assets/fonts/index.tsx",
-      "sha1": "05b761cbeb094a190b0d1a2409dd7aafea51a0e4"
+      "sha1": "dd87ddb8673dc9f260c21ae4d20d54e9b5b6b962"
     },
     {
       "path": "src/utils/assets/fonts/myntra.ttf",
-      "sha1": "cad7b872fdff49925d2d86589ec0f0d2ebdcc276"
+      "sha1": "0c80ce49e0a2240af7b51ec5ff3a9050a6d45341"
     }
   ]
 }
