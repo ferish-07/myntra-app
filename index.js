@@ -8,6 +8,7 @@ import {name as appName} from './app.json';
 
 Text.defaultProps = Text.defaultProps || {};
 Text.defaultProps.allowFontScaling = false;
+Text.defaultProps.color = 'black';
 
 TextInput.defaultProps = TextInput.defaultProps || {};
 TextInput.defaultProps.allowFontScaling = false;

@@ -5,9 +5,9 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Login from './Login';
 import Splash from './Splash';
 import BottomTabNavigator from './BottomTabNavigator';
-import Home from './Home';
-import Profile from './Profile';
 import AddCategory from './Category/AddCategory';
+import Order from './Order';
+import Profile from './Profile';
 
 export default function Router() {
   const Stack = createNativeStackNavigator();
@@ -18,6 +18,7 @@ export default function Router() {
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="BottomTab" component={BottomTabNavigator} />
         <Stack.Screen name="AddCategory" component={AddCategory} />
+        <Stack.Screen name="Orders" component={Order} />
       </Stack.Navigator>
     </NavigationContainer>
   );
