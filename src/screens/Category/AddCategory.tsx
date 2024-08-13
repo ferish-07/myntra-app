@@ -6,9 +6,11 @@ import {
   Text,
   View,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import Header from '../Common/Header';
 import CardView from '../Common/CardView';
+import {GoogleSignin} from '@react-native-google-signin/google-signin';
+
 import {Dropdown} from 'react-native-element-dropdown';
 export default function AddCategory({navigation}: any) {
   const [dropdownData, setDropDownData] = useState([
@@ -33,6 +35,43 @@ export default function AddCategory({navigation}: any) {
       data: [],
     },
   ]);
+  async function signIn() {
+    try {
+      await GoogleSignin.hasPlayServices();
+      const userInfo = await GoogleSignin.signIn();
+      console.log('User Info:', userInfo);
+
+      // Get access token
+      const {idToken} = await GoogleSignin.getTokens();
+      console.log('ID Token:', idToken);
+    } catch (error) {
+      console.error(error, 'eeeeeeeeeeeeeeeeeerrrrrrrrrrrrrrrrr');
+    }
+  }
+  useEffect(() => {
+    async function signIn() {
+      try {
+        let response = await GoogleSignin.configure({
+          webClientId:
+            '391122158812-csa23su1ctt4aerrr7m5123oodaa43it.apps.googleusercontent.com', // From client_id.json
+          offlineAccess: false, // If you want to obtain a refresh token
+          scopes: ['profile', 'email'],
+        });
+
+        console.log('---------', response);
+        // await GoogleSignin.hasPlayServices();
+        // const userInfo = await GoogleSignin.signIn();
+        // console.log('User Info:', userInfo);
+
+        // // Get access token
+        // const {idToken} = await GoogleSignin.getTokens();
+        // console.log('ID Token:', idToken);
+      } catch (error) {
+        console.error(error, 'eeeeeeeeeeeeeeeeeerrrrrrrrrrrrrrrrr');
+      }
+    }
+    signIn();
+  }, []);
   const [value, setValue] = useState<any>(null);
   const [newValue, setNewValue] = useState<any>(null);
   // const [newValue, setValue] = useState<any>(null);
@@ -57,6 +96,7 @@ export default function AddCategory({navigation}: any) {
             onSubmitClick={obj => {
               console.log('-----', obj);
               setNewValue(obj);
+              signIn();
             }}
           />
           <CardView
