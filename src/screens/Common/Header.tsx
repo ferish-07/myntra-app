@@ -3,9 +3,16 @@ import React from 'react';
 import {Fonts} from '../../utils/assets/fonts';
 interface ScreenProps {
   title: string;
-  navigation: any;
+  navigation?: any;
+  isBack?: boolean;
+  isHomePage?: boolean;
 }
-export default function Header({title, navigation}: ScreenProps) {
+export default function Header({
+  title,
+  navigation,
+  isBack = true,
+  isHomePage = false,
+}: ScreenProps) {
   return (
     <View
       style={{
@@ -28,19 +35,36 @@ export default function Header({title, navigation}: ScreenProps) {
         padding: 10,
         flexDirection: 'row',
       }}>
-      <TouchableOpacity
-        style={{
-          //   backgroundColor: 'red',
-          padding: 3,
-          position: 'absolute',
-          left: 1,
-        }}
-        onPress={() => navigation.goBack()}>
-        <Text style={{fontSize: 18, fontFamily: Fonts.myntra, color: 'black'}}>
-          {'arrow-left-solid'}
-        </Text>
-      </TouchableOpacity>
+      {isBack ? (
+        <TouchableOpacity
+          style={{
+            //   backgroundColor: 'red',
+            padding: 3,
+            position: 'absolute',
+            left: 1,
+          }}
+          onPress={() => navigation.goBack()}>
+          <Text
+            style={{fontSize: 18, fontFamily: Fonts.myntra, color: 'black'}}>
+            {'arrow-left-solid'}
+          </Text>
+        </TouchableOpacity>
+      ) : null}
       <Text style={{fontSize: 18, color: 'black'}}>{title}</Text>
+      {isHomePage ? (
+        <TouchableOpacity
+          style={{
+            //   backgroundColor: 'red',
+            padding: 3,
+            position: 'absolute',
+            right: 1,
+          }}>
+          <Text
+            style={{fontSize: 25, fontFamily: Fonts.myntra, color: 'black'}}>
+            {'wishlist'}
+          </Text>
+        </TouchableOpacity>
+      ) : null}
     </View>
   );
 }

@@ -1,4 +1,11 @@
-import {StyleSheet, Text, TouchableOpacity, View, Image} from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  Image,
+  FlatList,
+} from 'react-native';
 import React, {useState} from 'react';
 import Header from './Common/Header';
 import LoginModal from './Common/LoginModal';
@@ -6,12 +13,24 @@ import {Images} from '../utils/assets/fonts';
 
 export default function Order({route, navigation}: any) {
   const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const [orderList, setOrderList] = useState<[]>([]);
 
   const {isLoggedIn} = route.params;
+  const _renderFlatList = ({item, index}: any) => {
+    return (
+      <View>
+        <Text></Text>
+      </View>
+    );
+  };
   return (
     <View style={{flex: 1, backgroundColor: 'white'}}>
       <Header title="Orders" navigation={navigation} />
-      {isLoggedIn ? null : (
+      {isLoggedIn ? (
+        <View>
+          <FlatList data={orderList} renderItem={_renderFlatList} />
+        </View>
+      ) : (
         <>
           <View
             style={{

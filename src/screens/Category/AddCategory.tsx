@@ -1,4 +1,5 @@
 import {
+  Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -11,9 +12,10 @@ import Header from '../Common/Header';
 import CardView from '../Common/CardView';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import {launchImageLibrary} from 'react-native-image-picker';
-
+import RNFS from 'react-native-fs';
 import {Dropdown} from 'react-native-element-dropdown';
 import axios from 'axios';
+import {Buffer} from 'buffer';
 export default function AddCategory({navigation}: any) {
   const [dropdownData, setDropDownData] = useState([
     {
@@ -59,7 +61,9 @@ export default function AddCategory({navigation}: any) {
           webClientId:
             '391122158812-gu442o44r83nnntki3ldt4lgfj9chgv4.apps.googleusercontent.com', // From client_id.json
           offlineAccess: false, // If you want to obtain a refresh token
-          scopes: ['https://www.googleapis.com/auth/photoslibrary'],
+          scopes: ['https://www.googleapis.com/auth/drive.file'],
+          iosClientId:
+            '391122158812-1bh5uhheqki8f6jjiefm0u2o2fm3mkdi.apps.googleusercontent.com',
         });
 
         console.log('---------', response);
@@ -92,29 +96,34 @@ export default function AddCategory({navigation}: any) {
   async function uploadToGooglePhotos(photo: any) {
     const accessToken = await signIn();
     // let photo = await selectImage();
-    console.log('----------photo-', photo, accessToken, {
+    console.log('-------FER---photo-', photo.uri, accessToken, {
       Authorization: `Bearer ${accessToken}`,
       'Content-type': 'application/octet-stream',
       'X-Goog-Upload-File-Name': photo.fileName,
       'X-Goog-Upload-Protocol': 'raw',
     });
     const uploadUrl = 'https://photoslibrary.googleapis.com/v1/uploads';
-
-    const response = await axios.post(uploadUrl, {
+    const photoData = await RNFS.readFile(photo.uri, 'base64');
+    const binaryData = Buffer.from(photoData, 'base64');
+    // console.log('-binaryData-', binaryData, '--->', photoData);
+    const response = await axios.post(uploadUrl, binaryData, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
         'Content-type': 'application/octet-stream',
         'X-Goog-Upload-File-Name': photo.fileName,
         'X-Goog-Upload-Protocol': 'raw',
       },
-      body: photo.uri,
     });
 
-    const uploadToken =
-      'CAIS+QIAJoFQiv7a5uhADJ3NFnNFEUPRgk+0QTnAARsZDyHDOkIhBv61r8RaYcmtPx26XpsnB89R9laE2rV+Yl9MkJ/J0d7mRhMM7cs8/MTUZhaOev2Y/NDNkYF4wUt9HprAvSU3x4sJqWdIjuRpMUcRE2frJbTPWi3LgCP5Q0yj3OkAaRpAXBXLLTN9GFY3DKuQRUL4VbilY22N6IHgm8+bnwgCfDOV84QoPKA2V/7f14aanTYByIWTLtrARMj+mFXR28VHDPnJCXbeY24vy9zjOYb1TaN92qt5FWyHbgnQ/flRvKPF7c2swOo8BzD+6Ra/n+aGjFQlhaBlsf8dOqOkouTXxaidDjG4YFNTn70jW2x3ZDmQFZPMdat2qxw7oe+LYYdAhw4ksR332+1T9VxiIpXmL6ISwXw5ZWqYBX3vCYwvJwZSBlP23ZJ4PxS2HgvSiUYseLH5fu54/lnhTZCV5+xlqMC21QS4JW9XDZTMmSrvg9Wkno7ivDR11Q';
-    console.log('-----------uplooadd tokenb', uploadToken);
-
+    const uploadToken = response.data;
+    console.log(
+      '-----------uplooadd tokenb------',
+      JSON.stringify(uploadToken),
+    );
+    handleImageUpload(uploadToken, accessToken);
     // Create the media item in Google Photos
+  } //UPLOAD TO GOOGLE PHOTOS
+  async function handleImageUpload(uploadToken, accessToken) {
     const mediaItem = await axios.post(
       'https://photoslibrary.googleapis.com/v1/mediaItems:batchCreate',
       {
@@ -134,11 +143,7 @@ export default function AddCategory({navigation}: any) {
       },
     );
 
-    console.log(mediaItem.data, '----------response is here');
-  }
-  async function handleImageUpload() {
-    // const photo = await selectImage();
-    // await uploadToGooglePhotos();
+    console.log(JSON.stringify(mediaItem.data), '----------response is here');
   }
 
   // const [newValue, setValue] = useState<any>(null);
@@ -184,6 +189,13 @@ export default function AddCategory({navigation}: any) {
               console.log('-----', obj);
               setValue(obj);
             }}
+          />
+          <Image
+            source={{
+              // https://drive.google.com/file/d/1rzKAV5sXLYWcVBWBGDpwCyEUBWtb1PF0/view?pli=1
+              uri: 'https://drive.google.com/uc?export=view&id=1rzKAV5sXLYWcVBWBGDpwCyEUBWtb1PF0',
+            }}
+            style={{width: 200, height: 200, backgroundColor: 'red'}}
           />
           <View
             style={{
