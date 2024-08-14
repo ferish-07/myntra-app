@@ -1,4 +1,5 @@
 import {
+  Alert,
   Image,
   ImageBackground,
   SafeAreaView,
@@ -251,7 +252,8 @@ export default function Profile({navigation}: any) {
               flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'space-between',
-            }}>
+            }}
+            onPress={() => Alert.alert('LOG OUT !')}>
             <Text style={{fontSize: 16}}>Logout</Text>
             <Text
               style={{
