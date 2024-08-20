@@ -44,7 +44,8 @@ interface CardViewProps {
   isDropDown: Boolean;
   dropDownCount?: number;
   dropDownData: any;
-  imageButton: boolean;
+
+  children?: any;
 }
 
 export default function CardView(props: CardViewProps) {
@@ -64,7 +65,8 @@ export default function CardView(props: CardViewProps) {
     dropDownData,
     onDropDownChange = () => {},
     onDeletePressed = () => {},
-    imageButton,
+
+    children,
   } = props;
   const [listTextInput, setListTextInput] = useState<any[]>([]);
   const [TextInputValue, setTextInputValue] = useState<any>({});
@@ -289,37 +291,7 @@ export default function CardView(props: CardViewProps) {
             ) : null}
           </View>
         ) : null}
-        {imageButton ? (
-          <View
-            style={{
-              marginTop: 10,
-              width: '100%',
-              flexDirection: 'row',
-              justifyContent: 'flex-end',
-            }}>
-            <TouchableOpacity
-              style={{
-                width: '28%',
-                backgroundColor: '#1976D2',
-                padding: 5,
-                elevation: 2,
-                borderRadius: 5,
-                alignItems: 'center',
-                // height: 40,
-                // shadowColor: '#000',
-                shadowOffset: {
-                  width: 0,
-                  height: 1,
-                },
-                shadowOpacity: 0.2,
-                shadowRadius: 1.41,
-                marginLeft: 8,
-              }}
-              onPress={() => onSubmitClick({})}>
-              <Text style={{color: 'white', fontSize: 16}}>UPLOAD IMAGE</Text>
-            </TouchableOpacity>
-          </View>
-        ) : null}
+        {children}
       </View>
     </View>
   );
