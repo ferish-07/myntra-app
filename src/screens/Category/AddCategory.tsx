@@ -9,6 +9,7 @@ import {
   Vibration,
   View,
   ActionSheetIOS,
+  ActivityIndicator,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import Header from '../Common/Header';
@@ -21,6 +22,7 @@ import axios from 'axios';
 import {Buffer} from 'buffer';
 import Modal from 'react-native-modal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {Fonts} from '../../utils/assets/fonts';
 export default function AddCategory({navigation}: any) {
   const [dropdownData, setDropDownData] = useState([
     {
@@ -88,6 +90,10 @@ export default function AddCategory({navigation}: any) {
   const [value, setValue] = useState<any>(null);
   const [newValue, setNewValue] = useState<any>(null);
   const [OpenImageModal, setOpenImageModal] = useState<boolean>(false);
+  const [photoList, setPhotoList] = useState<any>([]);
+  const [imageIds, setImageIds] = useState<any>([]);
+  const [isUpLoading, setIsUploading] = useState<boolean>(false);
+
   const openActionSheet = async () => {
     ActionSheetIOS.showActionSheetWithOptions(
       {
@@ -119,8 +125,9 @@ export default function AddCategory({navigation}: any) {
           console.log('response', response);
           if (response.assets && response.assets.length > 0) {
             const photo = response.assets;
+            setPhotoList(photo);
             // console.log('0-----hjhj--------', photo);
-            uploadToGoogleDrive(photo);
+            // uploadToGoogleDrive(photo);
             // return photo;
             // Now you can use this photo for uploading
           }
@@ -181,21 +188,25 @@ export default function AddCategory({navigation}: any) {
 
   //   console.log(JSON.stringify(mediaItem.data), '----------response is here');
   // }
+
   //UPLOAD TO GOOGLE DRIVE
   async function uploadToGoogleDrive(photos: any) {
+    let newArr = [];
     const access_token = await AsyncStorage.getItem('access_token');
-    let accessToken;
+    let accessToken: any;
     if (access_token) {
       accessToken = access_token;
     } else {
       accessToken = await signIn();
       await AsyncStorage.setItem('access_token', JSON.stringify(accessToken));
     }
+    setIsUploading(true);
     const uploadFile = async (photos: any, fileName: any) => {
       console.log('---asas', photos);
       const fileMetadata = {
         name: photos.fileName,
         mimeType: 'image/jpeg',
+        parents: ['146iYBKtZlqwfQFpZoJNGX-t4dhNq6hj9'],
       };
       const fileBlob = await RNFS.readFile(photos.uri, 'base64');
       // const metadataBlob = new Blob([JSON.stringify(fileMetadata)], {
@@ -226,6 +237,9 @@ export default function AddCategory({navigation}: any) {
           `File ${photos.fileName} uploaded successfully:`,
           response.data,
         );
+        response.data.isLoading = false;
+        newArr.push(response.data);
+        console.log('----new arr', newArr);
         return response.data;
       } catch (error: any) {
         console.log(
@@ -243,7 +257,7 @@ export default function AddCategory({navigation}: any) {
               'access_token',
               JSON.stringify(accessToken),
             );
-            openActionSheet();
+            // openActionSheet();
           }
         }
         throw error;
@@ -263,7 +277,10 @@ export default function AddCategory({navigation}: any) {
       }
     }
     // await AsyncStorage.removeItem('access_token');
+
     console.log('All files processed sequentially.');
+    setImageIds(newArr);
+    setIsUploading(false);
     console.log('------->>>>>>ACCESS TOKEN<<<<------', accessToken);
     // for (let i = 0; i < photos.length; i++) {
     //   console.log('---->>ITMES', photos[i]);
@@ -308,6 +325,56 @@ export default function AddCategory({navigation}: any) {
   };
 
   // const [newValue, setValue] = useState<any>(null);
+  const removeImage = (item: any, index: any) => {
+    const newArr = [...photoList];
+    newArr.splice(index, 1);
+    setPhotoList(newArr);
+  };
+  const ImageItem = ({item}: any) => {
+    console.log('=====>>>', item);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+    return (
+      <View>
+        {isLoading ? (
+          <ActivityIndicator
+            style={{
+              // backgroundColor: 'red',
+              zIndex: 1,
+              position: 'absolute',
+              // backgroundColor: 'red',
+              width: 100,
+              height: 100,
+            }}
+            size={'large'}
+          />
+        ) : null}
+        <Image
+          source={{
+            // https://drive.google.com/file/d/1rzKAV5sXLYWcVBWBGDpwCyEUBWtb1PF0/view?pli=1
+            uri: `https://drive.google.com/uc?export=view&id=${item.id}`,
+          }}
+          onLoad={e => {
+            console.log('load ', e.nativeEvent);
+            setIsLoading(false);
+          }}
+          onLoadStart={() => {
+            console.log('load start');
+            setIsLoading(true);
+          }}
+          onLoadEnd={() => {
+            console.log('load end');
+            setIsLoading(false);
+          }}
+          style={{
+            width: 100,
+            height: 100,
+            backgroundColor: 'white',
+          }}
+          resizeMode="contain"
+        />
+      </View>
+    );
+  };
   return (
     <KeyboardAvoidingView
       style={{flex: 1}}
@@ -318,39 +385,47 @@ export default function AddCategory({navigation}: any) {
         <ScrollView
           style={{height: '98%', marginTop: 1}}
           keyboardShouldPersistTaps={'always'}>
-          {/* <CardView
-            title="Demo"
+          <CardView
+            title="Main Category"
             marginTop={5}
             isTextInput={true}
             isDropDown={false}
             dropDownData={dropdownData}
-            placeholder={['Id', 'Category']}
-            textInputCount={2}
+            placeholder={['Category Name']}
+            textInputCount={1}
             onSubmitClick={obj => {
               console.log('-----', obj);
               setNewValue(obj);
-              selectImage();
             }}
           />
           <CardView
-            title="USER DETAILS"
+            title="Section"
             marginTop={5}
-            isTextInput={true}
-            isDropDown={false}
+            isDropDown={true}
             dropDownData={dropdownData}
-            placeholder={[
-              'First Name',
-              'Last Name',
-              'Email',
-              'Contact Number',
-              'Password',
-            ]}
-            textInputCount={5}
+            dropDownCount={2}
+            isTextInput={true}
+            placeholder={['Section Name']}
+            textInputCount={1}
             onSubmitClick={obj => {
               console.log('-----', obj);
               setValue(obj);
             }}
-          /> */}
+          />
+          <CardView
+            title="Sub Section"
+            marginTop={5}
+            isDropDown={true}
+            dropDownData={dropdownData}
+            dropDownCount={1}
+            isTextInput={true}
+            placeholder={['Sub Section Name']}
+            textInputCount={1}
+            onSubmitClick={obj => {
+              console.log('-----', obj);
+              setValue(obj);
+            }}
+          />
           <CardView
             title="Upload Image"
             marginTop={5}
@@ -364,183 +439,148 @@ export default function AddCategory({navigation}: any) {
               'Contact Number',
               'Password',
             ]}
-            imageButton={true}
             // textInputCount={5}
             onSubmitClick={() => openActionSheet()}
-            buttonView={false}
-          />
-          {/* <Image
-            source={{
-              // https://drive.google.com/file/d/1rzKAV5sXLYWcVBWBGDpwCyEUBWtb1PF0/view?pli=1
-              uri: 'https://drive.google.com/uc?export=view&id=1rzKAV5sXLYWcVBWBGDpwCyEUBWtb1PF0',
-            }}
-            onLoad={e => {
-              console.log('load ', e.nativeEvent);
-            }}
-            onLoadStart={() => {
-              console.log('load start');
-            }}
-            onLoadEnd={() => {
-              console.log('load end');
-            }}
-            style={{width: 200, height: 200, backgroundColor: 'red'}}
-          /> */}
-          <View
-            style={{
-              // width: '90%',
-              // backgroundColor: 'red',
-              // alignSelf: 'center',
-              marginTop: 10,
-              flexDirection: 'row',
-              justifyContent: 'space-around',
-              flex: 1,
-            }}>
-            {newValue ? (
-              <View style={{borderRadius: 10, borderWidth: 1, padding: 10}}>
-                <View>
-                  <Text style={{fontWeight: 'bold'}}>DEMO CARD VALUE</Text>
-                </View>
-                {['Id', 'Category'].map((i, index) => {
-                  return (
-                    <View>
-                      {newValue ? (
-                        <>
-                          <Text>{`    ${i} - ${newValue?.TextInputValue[index]}`}</Text>
-                        </>
-                      ) : null}
-                    </View>
-                  );
-                })}
-              </View>
-            ) : null}
+            buttonView={false}>
+            <>
+              <ScrollView
+                contentContainerStyle={{
+                  flexDirection: 'row',
+                  margin: 5,
+                  elevation: 2,
+                  borderRadius: 5,
+                  alignItems: 'center',
+                  // height: 40,
+                  // shadowColor: '#000',
+                  shadowOffset: {
+                    width: 0,
+                    height: 1,
+                  },
+                  shadowOpacity: 0.2,
+                  shadowRadius: 1.41,
+                  paddingRight: 10,
+                  // marginHorizontal: 20,
+                  // flexWrap: 'wrap',
+                }}
+                scrollEnabled={true}
+                horizontal>
+                {photoList.map((i: any, index: any) => (
+                  <View
+                    style={{
+                      margin: 5,
+                    }}>
+                    <Image
+                      source={{
+                        // https://drive.google.com/file/d/1rzKAV5sXLYWcVBWBGDpwCyEUBWtb1PF0/view?pli=1
+                        uri: i.uri,
+                      }}
+                      onLoad={e => {
+                        console.log('load ', e.nativeEvent);
+                      }}
+                      onLoadStart={() => {
+                        console.log('load start');
+                      }}
+                      onLoadEnd={() => {
+                        console.log('load end');
+                      }}
+                      style={{
+                        width: 100,
+                        height: 100,
+                        backgroundColor: 'white',
+                      }}
+                      resizeMode="contain"
+                    />
 
-            {value ? (
-              <View style={{borderRadius: 10, borderWidth: 1, padding: 10}}>
-                <View>
-                  <Text style={{fontWeight: 'bold'}}>
-                    USER DETAILS CARD VALUE
+                    <TouchableOpacity
+                      style={{
+                        position: 'absolute',
+                        right: -5,
+                        backgroundColor: 'grey',
+                        borderRadius: 100,
+                        height: 20,
+                        width: 20,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        top: -5,
+                      }}
+                      onPress={() => removeImage(i, index)}>
+                      <Text style={{fontFamily: Fonts.myntra}}>{'close'}</Text>
+                    </TouchableOpacity>
+                  </View>
+                ))}
+              </ScrollView>
+
+              <View
+                style={{
+                  marginTop: 10,
+                  width: '100%',
+                  flexDirection: 'row',
+                  justifyContent: 'flex-end',
+                }}>
+                <TouchableOpacity
+                  style={{
+                    width: '30%',
+                    backgroundColor: '#1976D2',
+                    padding: 8,
+                    elevation: 2,
+                    borderRadius: 5,
+                    alignItems: 'center',
+                    // height: 40,
+                    // shadowColor: '#000',
+                    shadowOffset: {
+                      width: 0,
+                      height: 1,
+                    },
+                    shadowOpacity: 0.2,
+                    shadowRadius: 1.41,
+                    marginLeft: 8,
+                  }}
+                  onPress={() => openActionSheet()}>
+                  <Text style={{color: 'white', fontSize: 16}}>
+                    Select Image
                   </Text>
-                </View>
-                {[
-                  'First Name',
-                  'Last Name',
-                  'Email',
-                  'Contact Number',
-                  'Password',
-                ].map((i, index) => {
-                  return (
-                    <View>
-                      {value ? (
-                        <>
-                          <Text>{`   ${i} - ${value?.TextInputValue[index]}`}</Text>
-                        </>
-                      ) : null}
-                    </View>
-                  );
-                })}
+                </TouchableOpacity>
+                {photoList.length > 0 && (
+                  <TouchableOpacity
+                    style={{
+                      width: '35%',
+                      backgroundColor: '#1976D2',
+                      padding: 8,
+                      elevation: 2,
+                      borderRadius: 5,
+                      alignItems: 'center',
+                      // height: 40,
+                      // shadowColor: '#000',
+                      shadowOffset: {
+                        width: 0,
+                        height: 1,
+                      },
+                      shadowOpacity: 0.2,
+                      shadowRadius: 1.41,
+                      marginLeft: 8,
+                    }}
+                    onPress={() => uploadToGoogleDrive(photoList)}>
+                    {isUpLoading ? (
+                      <ActivityIndicator />
+                    ) : (
+                      <Text style={{color: 'white', fontSize: 16}}>
+                        Upload Image
+                      </Text>
+                    )}
+                  </TouchableOpacity>
+                )}
               </View>
-            ) : null}
-          </View>
-          {/* <CardView
-            title="Add Section"
-            marginTop={5}
-            isTextInput={true}
-            isDropDown={true}
-            dropDownData={dropdownData}
-            placeholder={['Type here..']}
-            textInputCount={1}
-            dropDownCount={2}
-            onSubmitClick={obj => {
-              console.log('-----', obj);
-            }}
-            onDropDownChange={data => {
-              console.log('-------far', data);
-              let newData = dropdownData;
-              if (data.id == 'main_category') {
-                newData[1].data = [
-                  {
-                    label: 'T-shirt',
-                    value: 'T-shirt',
-                  },
-                ];
-              }
-              if (data.id == 'section') {
-                newData[2].data = [
-                  {
-                    label: 'long',
-                    value: 'long',
-                  },
-                  {
-                    label: 'short',
-                    value: 'short',
-                  },
-                ];
-              }
-            }}
-            onDeletePressed={data => console.log('-----datete', data)}
-          />
-          <CardView
-            title="Add Sub Section"
-            marginTop={5}
-            isTextInput={true}
-            isDropDown={true}
-            dropDownData={dropdownData}
-            placeholder={['Type here..']}
-            textInputCount={1}
-            dropDownCount={2}
-            onSubmitClick={obj => {
-              console.log('-----', obj);
-            }}
-            onDropDownChange={data => {
-              console.log('-------far', data);
-              let newData = dropdownData;
-              if (data.id == 'main_category') {
-                newData[1].data = [
-                  {
-                    label: 'T-shirt',
-                    value: 'T-shirt',
-                  },
-                ];
-              }
-              if (data.id == 'section') {
-                newData[2].data = [
-                  {
-                    label: 'long',
-                    value: 'long',
-                  },
-                  {
-                    label: 'short',
-                    value: 'short',
-                  },
-                ];
-              }
-            }}
-            onDeletePressed={data => console.log('-----datete', data)}
-          />
-          <CardView
-            title="Add Brands"
-            marginTop={5}
-            isTextInput={true}
-            isDropDown={false}
-            dropDownData={dropdownData}
-            placeholder={['Type here..']}
-            textInputCount={1}
-            onSubmitClick={obj => {
-              console.log('-----', obj);
-            }}
-          />
-          <CardView
-            title="Add Brands"
-            marginTop={5}
-            isTextInput={true}
-            isDropDown={false}
-            dropDownData={dropdownData}
-            placeholder={['Type here..']}
-            textInputCount={1}
-            onSubmitClick={obj => {
-              console.log('-----', obj);
-            }}
-          /> */}
+            </>
+          </CardView>
+          {imageIds.length > 0 &&
+            imageIds.map((i: any) => {
+              console.log('-->>', i.id);
+              return (
+                <View>
+                  <ImageItem item={i} />
+                </View>
+              );
+            })}
         </ScrollView>
         {OpenImageModal ? ImagePickerModal() : null}
       </View>
