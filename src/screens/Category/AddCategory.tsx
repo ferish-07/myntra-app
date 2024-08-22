@@ -92,6 +92,7 @@ export default function AddCategory({navigation}: any) {
   const [OpenImageModal, setOpenImageModal] = useState<boolean>(false);
   const [photoList, setPhotoList] = useState<any>([]);
   const [imageIds, setImageIds] = useState<any>([]);
+  const [isUpLoading, setIsUploading] = useState<boolean>(false);
 
   const openActionSheet = async () => {
     ActionSheetIOS.showActionSheetWithOptions(
@@ -199,6 +200,7 @@ export default function AddCategory({navigation}: any) {
       accessToken = await signIn();
       await AsyncStorage.setItem('access_token', JSON.stringify(accessToken));
     }
+    setIsUploading(true);
     const uploadFile = async (photos: any, fileName: any) => {
       console.log('---asas', photos);
       const fileMetadata = {
@@ -278,6 +280,7 @@ export default function AddCategory({navigation}: any) {
 
     console.log('All files processed sequentially.');
     setImageIds(newArr);
+    setIsUploading(false);
     console.log('------->>>>>>ACCESS TOKEN<<<<------', accessToken);
     // for (let i = 0; i < photos.length; i++) {
     //   console.log('---->>ITMES', photos[i]);
@@ -382,39 +385,47 @@ export default function AddCategory({navigation}: any) {
         <ScrollView
           style={{height: '98%', marginTop: 1}}
           keyboardShouldPersistTaps={'always'}>
-          {/* <CardView
-            title="Demo"
+          <CardView
+            title="Main Category"
             marginTop={5}
             isTextInput={true}
             isDropDown={false}
             dropDownData={dropdownData}
-            placeholder={['Id', 'Category']}
-            textInputCount={2}
+            placeholder={['Category Name']}
+            textInputCount={1}
             onSubmitClick={obj => {
               console.log('-----', obj);
               setNewValue(obj);
-              selectImage();
             }}
           />
           <CardView
-            title="USER DETAILS"
+            title="Section"
             marginTop={5}
-            isTextInput={true}
-            isDropDown={false}
+            isDropDown={true}
             dropDownData={dropdownData}
-            placeholder={[
-              'First Name',
-              'Last Name',
-              'Email',
-              'Contact Number',
-              'Password',
-            ]}
-            textInputCount={5}
+            dropDownCount={2}
+            isTextInput={true}
+            placeholder={['Section Name']}
+            textInputCount={1}
             onSubmitClick={obj => {
               console.log('-----', obj);
               setValue(obj);
             }}
-          /> */}
+          />
+          <CardView
+            title="Sub Section"
+            marginTop={5}
+            isDropDown={true}
+            dropDownData={dropdownData}
+            dropDownCount={1}
+            isTextInput={true}
+            placeholder={['Sub Section Name']}
+            textInputCount={1}
+            onSubmitClick={obj => {
+              console.log('-----', obj);
+              setValue(obj);
+            }}
+          />
           <CardView
             title="Upload Image"
             marginTop={5}
@@ -549,9 +560,13 @@ export default function AddCategory({navigation}: any) {
                       marginLeft: 8,
                     }}
                     onPress={() => uploadToGoogleDrive(photoList)}>
-                    <Text style={{color: 'white', fontSize: 16}}>
-                      Upload Image
-                    </Text>
+                    {isUpLoading ? (
+                      <ActivityIndicator />
+                    ) : (
+                      <Text style={{color: 'white', fontSize: 16}}>
+                        Upload Image
+                      </Text>
+                    )}
                   </TouchableOpacity>
                 )}
               </View>
