@@ -10,6 +10,7 @@ import {
   View,
   ActionSheetIOS,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import Header from '../Common/Header';
@@ -95,24 +96,44 @@ export default function AddCategory({navigation}: any) {
   const [isUpLoading, setIsUploading] = useState<boolean>(false);
 
   const openActionSheet = async () => {
-    ActionSheetIOS.showActionSheetWithOptions(
-      {
-        options: ['Cancel', 'Select from library', 'Take a photo'],
-        cancelButtonIndex: 0,
-      },
-      async buttonIndex => {
-        if (buttonIndex === 1) {
-          selectImage('photo');
-        } else if (buttonIndex === 2) {
-          selectImage('camera');
-        }
-      },
-    );
+
+    if(Platform.OS == "ios"){
+
+      ActionSheetIOS.showActionSheetWithOptions(
+        {
+          options: ['Cancel', 'Select from library', 'Take a photo'],
+          cancelButtonIndex: 0,
+        },
+        async buttonIndex => {
+          if (buttonIndex === 1) {
+            selectImage('photo');
+          } else if (buttonIndex === 2) {
+            selectImage('camera');
+          }
+        },
+      );
+    }else{
+      Alert.alert("Select...","Please select any one option to Upload photo",[{text:"Cancel",onPress:()=>{
+
+      }},{text:"Select From library", onPress:()=>{
+        selectImage('photo');
+      }},{text:"Take Photo" ,onPress:()=>{
+        selectImage('camera');
+      }}])
+    }
   };
   async function selectImage(type: string) {
     if (type == 'camera') {
       await launchCamera({mediaType: 'mixed'}, response => {
         console.log('---response', response);
+        if (response.assets && response.assets.length > 0) {
+          const photo = response.assets;
+          setPhotoList(photo);
+          // console.log('0-----hjhj--------', photo);
+          // uploadToGoogleDrive(photo);
+          // return photo;
+          // Now you can use this photo for uploading
+        }
       });
     } else {
       await launchImageLibrary(
@@ -191,7 +212,7 @@ export default function AddCategory({navigation}: any) {
 
   //UPLOAD TO GOOGLE DRIVE
   async function uploadToGoogleDrive(photos: any) {
-    let newArr = [];
+    let newArr! : any[];
     const access_token = await AsyncStorage.getItem('access_token');
     let accessToken: any;
     if (access_token) {
