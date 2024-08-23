@@ -21,14 +21,7 @@ export default function CustomBottomBar({
   descriptors,
   navigation,
 }: CustomBarProps) {
-  console.log(
-    '----Statetttetetetetetetete',
-    typeof state,
-    '---',
-    typeof descriptors,
-    '------>',
-    typeof navigation,
-  );
+  
   interface Screen {
     label: string;
     key?: string;

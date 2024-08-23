@@ -11,7 +11,7 @@ import React, {useEffect, useState} from 'react';
 import SlidingComponent from './Common/SlidingComponent';
 import Header from './Common/Header';
 
-export default function Home() {
+export default function Home({navigation}:any) {
   const [mainCategory, setMainCategory] = useState<any[]>([
     {
       title: 'Fashion',
@@ -146,6 +146,12 @@ export default function Home() {
               </>
             ))}
           </View>
+            <TouchableOpacity style={{backgroundColor:'red', width:"10%", borderRadius:100, justifyContent:"center", alignItems:"center"}}
+            onPress={()=>navigation.navigate("Category_List") 
+            }
+            >
+              <Text>Cat</Text>
+            </TouchableOpacity>
         </View>
         {SelectedCategory?.subCategory?.map((i2: any) => (
           <TouchableOpacity onPress={() => console.log('--->>.', i2)}>

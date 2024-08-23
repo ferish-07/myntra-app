@@ -66,7 +66,7 @@ export default function BottomTabNavigator({navigation}: any) {
         height={55}
         circleWidth={50}
         bgColor="white"
-        initialRouteName="home"
+        initialRouteName="Home"
         borderTopLeftRight
         isCurved={isCurved}
         screenOptions={{unmountOnBlur: true, headerShown: false}}
@@ -97,7 +97,7 @@ export default function BottomTabNavigator({navigation}: any) {
         <CurvedBottomBar.Screen
           name="Home"
           position="LEFT"
-          component={() => <Home />}
+          component={() => <Home navigation={navigation}/>}
         />
         <CurvedBottomBar.Screen
           name="Profile"

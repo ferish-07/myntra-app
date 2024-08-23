@@ -8,6 +8,9 @@ import BottomTabNavigator from './BottomTabNavigator';
 import AddCategory from './Category/AddCategory';
 import Order from './Order';
 import Profile from './Profile';
+import Drawer from './Drawer/Drawer';
+import Category from './Category/Category';
+import Home from './Home';
 
 export default function Router() {
   const Stack = createNativeStackNavigator();
@@ -16,9 +19,11 @@ export default function Router() {
       <Stack.Navigator screenOptions={{headerShown: false}}>
         <Stack.Screen name="Splash" component={Splash} />
         <Stack.Screen name="Login" component={Login} />
+        {/* <Stack.Screen name="Drawer" component={Drawer} /> */}
         <Stack.Screen name="BottomTab" component={BottomTabNavigator} />
         <Stack.Screen name="AddCategory" component={AddCategory} />
         <Stack.Screen name="Orders" component={Order} />
+        <Stack.Screen name="Category_List" component={Category} />
       </Stack.Navigator>
     </NavigationContainer>
   );
