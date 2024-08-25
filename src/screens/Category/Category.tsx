@@ -7,44 +7,139 @@ import {
   Animated,
   StyleSheet,
   Dimensions,
+  Pressable,
+  ScrollView,
 } from 'react-native';
 const categories = [
-  {id: '1', title: 'Accessories', items: ['Item 1', 'Item 2', 'Item 3']},
+  {
+    id: '1',
+    title: 'Accessories',
+    items: [
+      {
+        id: '1',
+        title: 'Item 1',
+        subCategory: [
+          {title: 'Sub Title 1'},
+          {title: 'Sub Title 2'},
+          {title: 'Sub Title 3'},
+        ],
+      },
+      {
+        id: '2',
+        title: 'Item 2',
+        subCategory: [
+          {title: 'Sub Title 1 Item 2'},
+          {title: 'Sub Title 2 Item 2'},
+          {title: 'Sub Title 3 Item 2'},
+        ],
+      },
+      {
+        id: '3',
+        title: 'Item 3',
+        subCategory: [
+          {title: 'Sub Title 1 Item 3'},
+          {title: 'Sub Title 2 Item 3'},
+          {title: 'Sub Title 3 Item 3'},
+        ],
+      },
+    ],
+  },
   {
     id: '2',
     title: 'Jewellery',
     items: [
-      'Explore Jewellery Store',
-      'Ethnic Jewellery',
-      'Western Jewellery',
-      'Fine Jewellery',
+      {
+        id: '1',
+        title: 'Explore Jewellery Store',
+        subCategory: [
+          {title: 'Sub Title 1'},
+          {title: 'Sub Title 2'},
+          {title: 'Sub Title 3'},
+        ],
+      },
+      {
+        id: '2',
+        title: 'Ethnic Jewellery',
+        subCategory: [
+          {title: 'Sub Title 1 Item 2'},
+          {title: 'Sub Title 2 Item 2'},
+          {title: 'Sub Title 3 Item 2'},
+        ],
+      },
+      {
+        id: '3',
+        title: 'Western Jewellery',
+        subCategory: [
+          {title: 'Sub Title 1 Item 3'},
+          {title: 'Sub Title 2 Item 3'},
+          {title: 'Sub Title 3 Item 3'},
+        ],
+      },
+      {
+        id: '4',
+        title: 'Fine Jewellery',
+        subCategory: [
+          {title: 'Sub Title 1 Item 3'},
+          {title: 'Sub Title 2 Item 3'},
+          {title: 'Sub Title 3 Item 3'},
+        ],
+      },
     ],
   },
-  {id: '3', title: 'Home & Living', items: ['Item 1', 'Item 2', 'Item 3']},
-  {id: '4', title: 'Home & Living2', items: ['Item 1', 'Item 2', 'Item 3']},
+  {
+    id: '3',
+    title: 'Home & Livinge',
+    items: [
+      {
+        id: '1',
+        title: 'Explore Jewellery Store',
+        subCategory: [
+          {title: 'Sub Title 1'},
+          {title: 'Sub Title 2'},
+          {title: 'Sub Title 3'},
+        ],
+      },
+      {
+        id: '2',
+        title: 'Ethnic Jewellery',
+        subCategory: [
+          {title: 'Sub Title 1 Item 2'},
+          {title: 'Sub Title 2 Item 2'},
+          {title: 'Sub Title 3 Item 2'},
+        ],
+      },
+      {
+        id: '3',
+        title: 'Western Jewellery',
+        subCategory: [
+          {title: 'Sub Title 1 Item 3'},
+          {title: 'Sub Title 2 Item 3'},
+          {title: 'Sub Title 3 Item 3'},
+        ],
+      },
+      {
+        id: '4',
+        title: 'Fine Jewellery',
+        subCategory: [
+          {title: 'Sub Title 1 Item 3'},
+          {title: 'Sub Title 2 Item 3'},
+          {title: 'Sub Title 3 Item 3'},
+        ],
+      },
+    ],
+  },
 ];
 const {width} = Dimensions.get('window');
 interface AnimationRefs {
   [key: string]: any; // Replace `any` with a more specific type if possible
 }
 const Category = () => {
-  const getRowIndices = (numColumns: number, totalItems: number) => {
-    const rows = Math.ceil(totalItems / numColumns);
-    const rowIndices = [];
-
-    for (let row = 0; row < rows; row++) {
-      const firstIndex = row * numColumns;
-      const lastIndex = Math.min((row + 1) * numColumns - 1, totalItems - 1);
-      const middleIndex = Math.floor((firstIndex + lastIndex) / 2);
-      rowIndices.push({firstIndex, lastIndex, middleIndex});
-    }
-
-    return rowIndices;
-  };
-  const rowIndices = getRowIndices(3, categories.length);
-  console.log('------->>>>>>>', rowIndices);
   const [expandedCategory, setExpandedCategory] = useState(null); // To keep track of the expanded category
+  const [expandedSubCategory, setExpandedSubCategory] = useState(null); // To keep track of the expanded category
+  const [contentHeight, setContentHeight] = useState<any>({});
+  const [contentSubHeight, setContentSubHeight] = useState<any>({});
   const animationRefs = useRef<AnimationRefs>({}).current; // To store Animated.Value for each category
+  const animationRefsSubCategory = useRef<AnimationRefs>({}).current; // To store Animated.Value for each category
   const toggleExpand = (categoryId: any) => {
     if (expandedCategory === categoryId) {
       // Collapse the currently expanded category
@@ -73,33 +168,123 @@ const Category = () => {
       }).start();
     }
   };
-  const renderItem = ({item, index}: any) => {
+  const toggleExpandSubCategory = (categoryId: any) => {
+    if (expandedSubCategory === categoryId) {
+      // Collapse the currently expanded category
+      Animated.timing(animationRefsSubCategory[categoryId], {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: false,
+      }).start(() => {
+        setExpandedSubCategory(null);
+      });
+    } else {
+      if (expandedSubCategory) {
+        // Collapse the previously expanded category
+        Animated.timing(animationRefsSubCategory[expandedSubCategory], {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: false,
+        }).start();
+      }
+      // Expand the selected category
+      setExpandedSubCategory(categoryId);
+      Animated.timing(animationRefsSubCategory[categoryId], {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: false,
+      }).start();
+    }
+  };
+  const _renderSection = ({item, index}: any) => {
+    if (!animationRefsSubCategory[item.id]) {
+      animationRefsSubCategory[item.id] = new Animated.Value(0); // Initialize animated value if not present
+    }
+    const animatedHeight = animationRefsSubCategory[item.id].interpolate({
+      inputRange: [0, 1],
+      outputRange: [0, contentSubHeight[item.id] || 1], // Adjust based on content size
+      extrapolate: 'clamp',
+    });
+    const row = Math.floor(index / 3);
+
+    return (
+      <>
+        <TouchableOpacity
+          style={{position: 'relative'}}
+          onPress={() => toggleExpandSubCategory(item.id)}>
+          <View style={{backgroundColor: 'red', margin: 5, padding: 5}}>
+            <Text style={{fontSize: 15}}>{item.title}</Text>
+          </View>
+        </TouchableOpacity>
+        <Animated.View
+          style={{
+            overflow: 'hidden',
+            // height: animatedHeight,
+            // width: Dimensions.get('window').width,
+
+            // maxHeight: Dimensions.get('window').height * 0.4,
+            // marginHorizontal: 10,
+
+            marginTop: 5,
+            // backgroundColor: 'red',
+          }}>
+          {expandedSubCategory === item.id && (
+            <View
+              style={[styles.subItemsContainer, {paddingHorizontal: 10}]}
+              onLayout={(event: any) => {
+                const {height} = event.nativeEvent.layout;
+                setContentSubHeight((prev: any) => ({
+                  ...prev,
+                  [item.id]: height,
+                }));
+              }}>
+              <FlatList
+                data={item.subCategory}
+                renderItem={({item, index}) => {
+                  return (
+                    <View>
+                      <Text>{item.title}</Text>
+                    </View>
+                  );
+                }}
+              />
+            </View>
+          )}
+        </Animated.View>
+      </>
+    );
+  };
+  const _renderItem = ({item, index}: any) => {
     if (!animationRefs[item.id]) {
       animationRefs[item.id] = new Animated.Value(0); // Initialize animated value if not present
     }
     const animatedHeight = animationRefs[item.id].interpolate({
       inputRange: [0, 1],
-      outputRange: [0, 150], // Adjust based on content size
+      outputRange: [0, contentHeight[item.id] || 1], // Adjust based on content size
       extrapolate: 'clamp',
     });
     const row = Math.floor(index / 3);
-    const {firstIndex, lastIndex, middleIndex} = rowIndices[row];
 
-    const isFirstInRow = index === firstIndex;
-    const isLastInRow = index === lastIndex;
-    const isMiddleInRow = index === middleIndex;
     let right = 0;
-    if (isFirstInRow) {
-      right = 0;
+    const firstItemIndexAsPerRow = index - (index % 3);
+    const lastItemIndexAsPerRow = firstItemIndexAsPerRow + 2;
+    const middleItemIndexAsPerRow = firstItemIndexAsPerRow + 1;
+    if (firstItemIndexAsPerRow == item.id - 1) {
+      right = Dimensions.get('window').width / 26;
     }
-    if (isLastInRow) {
-      right = 260;
+    if (lastItemIndexAsPerRow == item.id - 1) {
+      right = Dimensions.get('window').width / 1.52;
     }
-    if (isMiddleInRow) {
-      right = 130;
+
+    if (middleItemIndexAsPerRow == item.id - 1) {
+      right = Dimensions.get('window').width / 2.87;
     }
     return (
-      <View style={styles.categoryContainer}>
+      <View
+        style={[
+          styles.categoryContainer,
+          {zIndex: expandedCategory === item.id ? 1000 : 0},
+        ]}>
         <TouchableOpacity
           onPress={() => toggleExpand(item.id)}
           style={styles.categoryHeader}>
@@ -109,16 +294,25 @@ const Category = () => {
           style={{
             overflow: 'hidden',
             height: animatedHeight,
-            width: Dimensions.get('screen').width - 30,
+            width: Dimensions.get('window').width,
+
+            // maxHeight: Dimensions.get('window').height * 0.4,
+            // marginHorizontal: 10,
             right: right,
+            marginTop: 5,
+            // backgroundColor: 'red',
           }}>
           {expandedCategory === item.id && (
-            <View style={styles.subItemsContainer}>
-              {item.items.map((subItem: any, index: number) => (
-                <Text key={index} style={styles.subItemText}>
-                  {subItem}
-                </Text>
-              ))}
+            <View
+              style={[styles.subItemsContainer, {paddingHorizontal: 10}]}
+              onLayout={(event: any) => {
+                const {height} = event.nativeEvent.layout;
+                setContentHeight((prev: any) => ({
+                  ...prev,
+                  [item.id]: height,
+                }));
+              }}>
+              <FlatList data={item.items} renderItem={_renderSection} />
             </View>
           )}
         </Animated.View>
@@ -128,7 +322,8 @@ const Category = () => {
   return (
     <FlatList
       data={categories}
-      renderItem={renderItem}
+      // renderItem={renderItem}
+      renderItem={_renderItem}
       keyExtractor={item => item.id}
       numColumns={3} // Set to 3 items per row
       contentContainerStyle={styles.list}
@@ -141,7 +336,7 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
   categoryContainer: {
-    flex: 1 / 3, // Makes sure 3 items are placed in one row
+    width: '30%', // Makes sure 3 items are placed in one row
     margin: 5, // Adjusts the spacing between the items
   },
   categoryHeader: {
@@ -158,10 +353,11 @@ const styles = StyleSheet.create({
     textAlign: 'center', // Centers the text within the category
   },
   subItemsContainer: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    backgroundColor: 'red',
-    borderRadius: 10,
+    // paddingVertical: 10,
+    // paddingHorizontal: 20,
+    backgroundColor: 'white',
+    // borderRadius: 10,
+    // zIndex: 1000,
   },
   subItemText: {
     paddingVertical: 5,

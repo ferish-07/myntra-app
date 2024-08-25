@@ -96,9 +96,7 @@ export default function AddCategory({navigation}: any) {
   const [isUpLoading, setIsUploading] = useState<boolean>(false);
 
   const openActionSheet = async () => {
-
-    if(Platform.OS == "ios"){
-
+    if (Platform.OS == 'ios') {
       ActionSheetIOS.showActionSheetWithOptions(
         {
           options: ['Cancel', 'Select from library', 'Take a photo'],
@@ -112,14 +110,22 @@ export default function AddCategory({navigation}: any) {
           }
         },
       );
-    }else{
-      Alert.alert("Select...","Please select any one option to Upload photo",[{text:"Cancel",onPress:()=>{
-
-      }},{text:"Select From library", onPress:()=>{
-        selectImage('photo');
-      }},{text:"Take Photo" ,onPress:()=>{
-        selectImage('camera');
-      }}])
+    } else {
+      Alert.alert('Select...', 'Please select any one option to Upload photo', [
+        {text: 'Cancel', onPress: () => {}},
+        {
+          text: 'Select From library',
+          onPress: () => {
+            selectImage('photo');
+          },
+        },
+        {
+          text: 'Take Photo',
+          onPress: () => {
+            selectImage('camera');
+          },
+        },
+      ]);
     }
   };
   async function selectImage(type: string) {
@@ -212,7 +218,7 @@ export default function AddCategory({navigation}: any) {
 
   //UPLOAD TO GOOGLE DRIVE
   async function uploadToGoogleDrive(photos: any) {
-    let newArr! : any[];
+    let newArr = [];
     const access_token = await AsyncStorage.getItem('access_token');
     let accessToken: any;
     if (access_token) {

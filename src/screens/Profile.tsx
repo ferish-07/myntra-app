@@ -18,7 +18,7 @@ import LoginModal from './Common/LoginModal';
 import Header from './Common/Header';
 export default function Profile({navigation}: any) {
   const [modalVisible, setModalVisible] = useState<boolean>(false);
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(true);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
   useEffect(() => {
     console.log('----in profile tab');
