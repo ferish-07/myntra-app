@@ -10,23 +10,24 @@ import {
   Pressable,
   ScrollView,
 } from 'react-native';
+import Header from '../Common/Header';
 const categories = [
   {
     id: '1',
-    title: 'Accessories',
+    title: 'Women',
     items: [
       {
         id: '1',
-        title: 'Item 1',
+        title: 'Westernwear',
         subCategory: [
-          {title: 'Sub Title 1'},
-          {title: 'Sub Title 2'},
-          {title: 'Sub Title 3'},
+          {title: 'Skirts'},
+          {title: 'Shorts'},
+          {title: 'Playsuits'},
         ],
       },
       {
         id: '2',
-        title: 'Item 2',
+        title: 'Ethnic & Fusionwear',
         subCategory: [
           {title: 'Sub Title 1 Item 2'},
           {title: 'Sub Title 2 Item 2'},
@@ -133,14 +134,19 @@ const {width} = Dimensions.get('window');
 interface AnimationRefs {
   [key: string]: any; // Replace `any` with a more specific type if possible
 }
-const Category = () => {
+const Category = ({navigation}: any) => {
   const [expandedCategory, setExpandedCategory] = useState(null); // To keep track of the expanded category
-  const [expandedSubCategory, setExpandedSubCategory] = useState(null); // To keep track of the expanded category
+  const [expandedSubCategory, setExpandedSubCategory] = useState(null); // To  keep track of the expanded category
   const [contentHeight, setContentHeight] = useState<any>({});
-  const [contentSubHeight, setContentSubHeight] = useState<any>({});
   const animationRefs = useRef<AnimationRefs>({}).current; // To store Animated.Value for each category
   const animationRefsSubCategory = useRef<AnimationRefs>({}).current; // To store Animated.Value for each category
   const toggleExpand = (categoryId: any) => {
+    setExpandedSubCategory(null);
+    // setContentSubHeight({});
+    // Object.keys(animationRefsSubCategory).forEach(key => {
+    //   delete animationRefsSubCategory[key];
+    // });
+
     if (expandedCategory === categoryId) {
       // Collapse the currently expanded category
       Animated.timing(animationRefs[categoryId], {
@@ -170,81 +176,67 @@ const Category = () => {
   };
   const toggleExpandSubCategory = (categoryId: any) => {
     if (expandedSubCategory === categoryId) {
-      // Collapse the currently expanded category
-      Animated.timing(animationRefsSubCategory[categoryId], {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: false,
-      }).start(() => {
-        setExpandedSubCategory(null);
-      });
+      setExpandedSubCategory(null);
     } else {
-      if (expandedSubCategory) {
-        // Collapse the previously expanded category
-        Animated.timing(animationRefsSubCategory[expandedSubCategory], {
-          toValue: 0,
-          duration: 300,
-          useNativeDriver: false,
-        }).start();
-      }
-      // Expand the selected category
       setExpandedSubCategory(categoryId);
-      Animated.timing(animationRefsSubCategory[categoryId], {
-        toValue: 1,
-        duration: 300,
-        useNativeDriver: false,
-      }).start();
     }
   };
   const _renderSection = ({item, index}: any) => {
-    if (!animationRefsSubCategory[item.id]) {
-      animationRefsSubCategory[item.id] = new Animated.Value(0); // Initialize animated value if not present
-    }
-    const animatedHeight = animationRefsSubCategory[item.id].interpolate({
-      inputRange: [0, 1],
-      outputRange: [0, contentSubHeight[item.id] || 1], // Adjust based on content size
-      extrapolate: 'clamp',
-    });
-    const row = Math.floor(index / 3);
-
     return (
       <>
         <TouchableOpacity
           style={{position: 'relative'}}
           onPress={() => toggleExpandSubCategory(item.id)}>
-          <View style={{backgroundColor: 'red', margin: 5, padding: 5}}>
-            <Text style={{fontSize: 15}}>{item.title}</Text>
+          <View
+            style={{
+              // padding: 5,
+              backgroundColor:
+                expandedSubCategory === item.id ? 'white' : '#f8f8f8',
+              paddingHorizontal: 15,
+            }}>
+            <View
+              style={{
+                borderBottomWidth: 1,
+                flexDirection: 'row',
+                // margin: 5,
+                borderColor: '#e9eaec',
+                padding: 8,
+                justifyContent: 'space-between',
+              }}>
+              <Text style={{fontSize: 15}}>{item.title}</Text>
+              <Text style={{transform: [{rotate: '90deg'}]}}>
+                {expandedSubCategory === item.id ? '<' : '>'}
+              </Text>
+            </View>
           </View>
         </TouchableOpacity>
         <Animated.View
           style={{
             overflow: 'hidden',
-            // height: animatedHeight,
-            // width: Dimensions.get('window').width,
-
-            // maxHeight: Dimensions.get('window').height * 0.4,
-            // marginHorizontal: 10,
-
-            marginTop: 5,
-            // backgroundColor: 'red',
           }}>
           {expandedSubCategory === item.id && (
-            <View
-              style={[styles.subItemsContainer, {paddingHorizontal: 10}]}
-              onLayout={(event: any) => {
-                const {height} = event.nativeEvent.layout;
-                setContentSubHeight((prev: any) => ({
-                  ...prev,
-                  [item.id]: height,
-                }));
-              }}>
+            <View style={[{paddingHorizontal: 10, backgroundColor: 'white'}]}>
               <FlatList
                 data={item.subCategory}
                 renderItem={({item, index}) => {
                   return (
-                    <View>
-                      <Text>{item.title}</Text>
-                    </View>
+                    <TouchableOpacity
+                      style={{marginLeft: 20, paddingHorizontal: 5}}
+                      onPress={() =>
+                        navigation.navigate('Products', {title: item.title})
+                      }>
+                      <View
+                        style={{
+                          borderBottomWidth: 1,
+                          //  flexDirection: 'row',
+                          // margin: 5,
+                          borderColor: '#e9eaec',
+                          padding: 8,
+                          //  justifyContent: 'space-between',
+                        }}>
+                        <Text>{item.title}</Text>
+                      </View>
+                    </TouchableOpacity>
                   );
                 }}
               />
@@ -283,11 +275,19 @@ const Category = () => {
       <View
         style={[
           styles.categoryContainer,
-          {zIndex: expandedCategory === item.id ? 1000 : 0},
+          {
+            zIndex: expandedCategory === item.id ? 1000 : 0,
+          },
         ]}>
         <TouchableOpacity
           onPress={() => toggleExpand(item.id)}
-          style={styles.categoryHeader}>
+          style={[
+            styles.categoryHeader,
+            {
+              borderWidth: 1,
+              borderColor: expandedCategory === item.id ? '#ff406c' : '#f8f8f8',
+            },
+          ]}>
           <Text style={styles.categoryTitle}>{item.title}</Text>
         </TouchableOpacity>
         <Animated.View
@@ -304,7 +304,17 @@ const Category = () => {
           }}>
           {expandedCategory === item.id && (
             <View
-              style={[styles.subItemsContainer, {paddingHorizontal: 10}]}
+              style={[
+                styles.subItemsContainer,
+                {
+                  // paddingHorizontal: 10,
+                  borderTopWidth: 1,
+                  borderTopColor: '#ff406c',
+
+                  // backgroundColor:
+                  //   expandedCategory === item.id ? 'red' : '#f8f8f8',
+                },
+              ]}
               onLayout={(event: any) => {
                 const {height} = event.nativeEvent.layout;
                 setContentHeight((prev: any) => ({
@@ -320,14 +330,17 @@ const Category = () => {
     );
   };
   return (
-    <FlatList
-      data={categories}
-      // renderItem={renderItem}
-      renderItem={_renderItem}
-      keyExtractor={item => item.id}
-      numColumns={3} // Set to 3 items per row
-      contentContainerStyle={styles.list}
-    />
+    <View style={{backgroundColor: 'white', flex: 1}}>
+      <Header title="Categories" navigation={navigation} />
+      <FlatList
+        data={categories}
+        // renderItem={renderItem}
+        renderItem={_renderItem}
+        keyExtractor={item => item.id}
+        numColumns={3} // Set to 3 items per row
+        contentContainerStyle={styles.list}
+      />
+    </View>
   );
 };
 const styles = StyleSheet.create({
@@ -355,7 +368,7 @@ const styles = StyleSheet.create({
   subItemsContainer: {
     // paddingVertical: 10,
     // paddingHorizontal: 20,
-    backgroundColor: 'white',
+    backgroundColor: '#f8f8f8',
     // borderRadius: 10,
     // zIndex: 1000,
   },
