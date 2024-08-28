@@ -16,6 +16,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import Header from '../Common/Header';
 import moment from 'moment';
+import {CalculateDiscount} from '../../utils/common/Common';
 // import {ScrollView} from 'react-native-gesture-handler';
 
 export default function ProductDetails({route, navigation}: any) {
@@ -27,10 +28,6 @@ export default function ProductDetails({route, navigation}: any) {
     const xPos = event.nativeEvent.contentOffset.x;
     const current = Math.floor(xPos / totalWidth);
     setCurrentIndex(current);
-  };
-  const calculateDiscount = (originalPrice: any, discount: any) => {
-    let discount_price = originalPrice - originalPrice * (discount / 100);
-    return discount_price.toFixed(0);
   };
 
   const _renderImage = ({item, index}: any) => {
@@ -149,7 +146,7 @@ export default function ProductDetails({route, navigation}: any) {
                 marginLeft: 8,
                 // textDecorationLine: 'line-through',
               }}>
-              {`₹${calculateDiscount(
+              {`₹${CalculateDiscount(
                 product.price,
                 product.discounted_percent,
               )}`}
@@ -180,9 +177,21 @@ export default function ProductDetails({route, navigation}: any) {
                 style={{color: '#262a39', fontWeight: 'bold', fontSize: 16}}>
                 Select Size
               </Text>
-              <Text style={{color: '#ff3e6b', fontWeight: '600', fontSize: 14}}>
-                Size Chart {'>'}
-              </Text>
+              <TouchableOpacity
+                style={{flexDirection: 'row'}}
+                onPress={() =>
+                  navigation.navigate('SizeChart', {productDetail: product})
+                }>
+                <Text
+                  style={{color: '#ff3e6b', fontWeight: '600', fontSize: 14}}>
+                  Size Chart
+                </Text>
+                <Ionicons
+                  name="chevron-forward-outline"
+                  size={18}
+                  color="#ff3e6b"
+                />
+              </TouchableOpacity>
             </View>
             <FlatList
               data={product.available_size}

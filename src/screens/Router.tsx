@@ -11,8 +11,9 @@ import Profile from './Profile';
 import Drawer from './Drawer/Drawer';
 import Category from './Category/Category';
 import Home from './Home';
-import Products from './Category/Products';
-import ProductDetails from './Category/ProductDetails';
+import Products from './Product/Products';
+import ProductDetails from './Product/ProductDetails';
+import SizeChart from './Product/SizeChart';
 
 export default function Router() {
   const Stack = createNativeStackNavigator();
@@ -28,6 +29,7 @@ export default function Router() {
         <Stack.Screen name="Category_List" component={Category} />
         <Stack.Screen name="Products" component={Products} />
         <Stack.Screen name="Product_details" component={ProductDetails} />
+        <Stack.Screen name="SizeChart" component={SizeChart} />
       </Stack.Navigator>
     </NavigationContainer>
   );

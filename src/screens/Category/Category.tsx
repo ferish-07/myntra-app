@@ -1,4 +1,4 @@
-import React, {useState, useRef} from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import {
   View,
   Text,
@@ -9,8 +9,12 @@ import {
   Dimensions,
   Pressable,
   ScrollView,
+  Platform,
+  UIManager,
+  LayoutAnimation,
 } from 'react-native';
 import Header from '../Common/Header';
+import Icon from 'react-native-vector-icons/Ionicons';
 const categories = [
   {
     id: '1',
@@ -137,50 +141,26 @@ interface AnimationRefs {
 const Category = ({navigation}: any) => {
   const [expandedCategory, setExpandedCategory] = useState(null); // To keep track of the expanded category
   const [expandedSubCategory, setExpandedSubCategory] = useState(null); // To  keep track of the expanded category
-  const [contentHeight, setContentHeight] = useState<any>({});
-  const animationRefs = useRef<AnimationRefs>({}).current; // To store Animated.Value for each category
-  const animationRefsSubCategory = useRef<AnimationRefs>({}).current; // To store Animated.Value for each category
+  useEffect(() => {
+    if (Platform.OS === 'android') {
+      UIManager.setLayoutAnimationEnabledExperimental(true);
+    }
+  }, []);
+
   const toggleExpand = (categoryId: any) => {
     setExpandedSubCategory(null);
-    // setContentSubHeight({});
-    // Object.keys(animationRefsSubCategory).forEach(key => {
-    //   delete animationRefsSubCategory[key];
-    // });
-
-    if (expandedCategory === categoryId) {
-      // Collapse the currently expanded category
-      Animated.timing(animationRefs[categoryId], {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: false,
-      }).start(() => {
-        setExpandedCategory(null);
-      });
-    } else {
-      if (expandedCategory) {
-        // Collapse the previously expanded category
-        Animated.timing(animationRefs[expandedCategory], {
-          toValue: 0,
-          duration: 300,
-          useNativeDriver: false,
-        }).start();
-      }
-      // Expand the selected category
-      setExpandedCategory(categoryId);
-      Animated.timing(animationRefs[categoryId], {
-        toValue: 1,
-        duration: 300,
-        useNativeDriver: false,
-      }).start();
-    }
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setExpandedCategory(categoryId);
   };
   const toggleExpandSubCategory = (categoryId: any) => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     if (expandedSubCategory === categoryId) {
       setExpandedSubCategory(null);
     } else {
       setExpandedSubCategory(categoryId);
     }
   };
+
   const _renderSection = ({item, index}: any) => {
     return (
       <>
@@ -204,9 +184,12 @@ const Category = ({navigation}: any) => {
                 justifyContent: 'space-between',
               }}>
               <Text style={{fontSize: 15}}>{item.title}</Text>
-              <Text style={{transform: [{rotate: '90deg'}]}}>
-                {expandedSubCategory === item.id ? '<' : '>'}
-              </Text>
+
+              {expandedSubCategory === item.id ? (
+                <Icon name="chevron-up-outline" size={20} />
+              ) : (
+                <Icon name="chevron-down-outline" size={20} />
+              )}
             </View>
           </View>
         </TouchableOpacity>
@@ -247,16 +230,6 @@ const Category = ({navigation}: any) => {
     );
   };
   const _renderItem = ({item, index}: any) => {
-    if (!animationRefs[item.id]) {
-      animationRefs[item.id] = new Animated.Value(0); // Initialize animated value if not present
-    }
-    const animatedHeight = animationRefs[item.id].interpolate({
-      inputRange: [0, 1],
-      outputRange: [0, contentHeight[item.id] || 1], // Adjust based on content size
-      extrapolate: 'clamp',
-    });
-    const row = Math.floor(index / 3);
-
     let right = 0;
     const firstItemIndexAsPerRow = index - (index % 3);
     const lastItemIndexAsPerRow = firstItemIndexAsPerRow + 2;
@@ -293,7 +266,7 @@ const Category = ({navigation}: any) => {
         <Animated.View
           style={{
             overflow: 'hidden',
-            height: animatedHeight,
+            // height: animatedHeight,
             width: Dimensions.get('window').width,
 
             // maxHeight: Dimensions.get('window').height * 0.4,
@@ -307,21 +280,10 @@ const Category = ({navigation}: any) => {
               style={[
                 styles.subItemsContainer,
                 {
-                  // paddingHorizontal: 10,
                   borderTopWidth: 1,
                   borderTopColor: '#ff406c',
-
-                  // backgroundColor:
-                  //   expandedCategory === item.id ? 'red' : '#f8f8f8',
                 },
-              ]}
-              onLayout={(event: any) => {
-                const {height} = event.nativeEvent.layout;
-                setContentHeight((prev: any) => ({
-                  ...prev,
-                  [item.id]: height,
-                }));
-              }}>
+              ]}>
               <FlatList data={item.items} renderItem={_renderSection} />
             </View>
           )}

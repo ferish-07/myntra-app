@@ -6,10 +6,13 @@ import {
   Image,
   Dimensions,
   TouchableOpacity,
+  Platform,
+  UIManager,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import Header from '../Common/Header';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import {CalculateDiscount} from '../../utils/common/Common';
 
 export default function Products({route, navigation}: any) {
   const {title} = route.params;
@@ -141,10 +144,7 @@ export default function Products({route, navigation}: any) {
       ],
     },
   ]);
-  const calculateDiscount = (originalPrice: any, discount: any) => {
-    let discount_price = originalPrice - originalPrice * (discount / 100);
-    return discount_price.toFixed(0);
-  };
+
   const _renderProductList = ({item, index}: any) => {
     return (
       <TouchableOpacity
@@ -212,7 +212,7 @@ export default function Products({route, navigation}: any) {
                 marginLeft: 8,
                 // textDecorationLine: 'line-through',
               }}>
-              {`₹${calculateDiscount(item.price, item.discounted_percent)}`}
+              {`₹${CalculateDiscount(item.price, item.discounted_percent)}`}
             </Text>
             <Text
               style={{
