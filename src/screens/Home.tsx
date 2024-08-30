@@ -10,8 +10,9 @@ import {
 import React, {useEffect, useState} from 'react';
 import SlidingComponent from './Common/SlidingComponent';
 import Header from './Common/Header';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
-export default function Home({navigation}:any) {
+export default function Home({navigation}: any) {
   const [mainCategory, setMainCategory] = useState<any[]>([
     {
       title: 'Fashion',
@@ -115,7 +116,7 @@ export default function Home({navigation}:any) {
           <View
             style={{
               width: '90%',
-              marginTop: 5,
+              // marginTop: 5,
               flexDirection: 'row',
               // backgroundColor: 'red',
             }}>
@@ -127,7 +128,7 @@ export default function Home({navigation}:any) {
                     borderRadius: 50,
                     borderWidth: 1,
                     marginHorizontal: 5,
-                    width: '30%',
+                    width: '31%',
                     justifyContent: 'center',
                     alignItems: 'center',
                     borderColor: '#282c3f',
@@ -146,12 +147,27 @@ export default function Home({navigation}:any) {
               </>
             ))}
           </View>
-            <TouchableOpacity style={{backgroundColor:'red', width:"10%", borderRadius:100, justifyContent:"center", alignItems:"center"}}
-            onPress={()=>navigation.navigate("Category_List") 
-            }
-            >
-              <Text>Cat</Text>
+          <View
+            style={{
+              width: '10%',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <TouchableOpacity
+              style={{
+                // backgroundColor: 'red',
+                width: 35,
+                height: 35,
+                borderRadius: 100,
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderWidth: 1,
+                // padding: 5,
+              }}
+              onPress={() => navigation.navigate('Category_List')}>
+              <Ionicons name="grid-outline" size={22} />
             </TouchableOpacity>
+          </View>
         </View>
         {SelectedCategory?.subCategory?.map((i2: any) => (
           <TouchableOpacity onPress={() => console.log('--->>.', i2)}>
