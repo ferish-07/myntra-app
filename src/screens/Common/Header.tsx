@@ -17,7 +17,7 @@ export default function Header({
     <View
       style={{
         backgroundColor: 'white',
-        // height: 25,
+        height: 40,
         justifyContent: 'center',
         alignItems: 'center',
         elevation: 2,
@@ -32,7 +32,7 @@ export default function Header({
           height: 2,
         },
         shadowColor: '#000',
-        padding: 10,
+        // padding: 10,
         flexDirection: 'row',
       }}>
       {isBack ? (
