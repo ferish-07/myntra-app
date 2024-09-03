@@ -27,6 +27,7 @@ import {
 import Login from './src/screens/Login';
 import Router from './src/screens/Router';
 import Demo from './src/screens/Demo';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
 
 type SectionProps = PropsWithChildren<{
   title: string;
@@ -66,9 +67,11 @@ function App(): React.JSX.Element {
   };
 
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
-      <Router />
-    </SafeAreaView>
+    <SafeAreaProvider>
+      <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
+        <Router />
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 }
 
