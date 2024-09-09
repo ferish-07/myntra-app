@@ -1,4 +1,4 @@
-package com.curvedbottombar;
+package com.app_myntra;
 
 import android.annotation.SuppressLint;
 import android.content.Context;

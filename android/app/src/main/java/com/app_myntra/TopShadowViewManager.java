@@ -10,8 +10,8 @@ import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.ViewGroupManager;
 import com.facebook.react.uimanager.annotations.ReactProp;
 
-public class CurvedBottomBarViewManager extends ViewGroupManager<ShadowLayout> {
-  public static final String REACT_CLASS = "CurvedBottomBarView";
+public class TopShadowViewManager extends ViewGroupManager<ShadowLayout> {
+  public static final String REACT_CLASS = "TopShadowView";
 
   public ShadowListener imageListener;
 

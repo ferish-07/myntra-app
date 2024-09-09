@@ -30,7 +30,7 @@ interface CardViewProps {
   cardStyle?: StyleProp<ViewStyle>;
   marginTop: Range<0, 50>;
   isTextInput: Boolean;
-  placeholder: string[];
+  placeholder?: string[];
   isResetButton?: Boolean;
   buttonView?: Boolean;
   isSaveButton?: Boolean;
@@ -121,7 +121,7 @@ export default function CardView(props: CardViewProps) {
                     borderRadius: 5,
                     paddingHorizontal: 8,
                   }}
-                  placeholder={placeholder[index]}
+                  placeholder={placeholder ? placeholder[index] : ''}
                   value={TextInputValue[`${index}`]}
                   onChangeText={text => {
                     let newObj = {

@@ -11,12 +11,18 @@ import {
   ActionSheetIOS,
   ActivityIndicator,
   Alert,
+  FlatList,
+  UIManager,
+  LayoutAnimation,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import Header from '../Common/Header';
 import CardView from '../Common/CardView';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import {launchImageLibrary, launchCamera} from 'react-native-image-picker';
+import DocumentPicker from 'react-native-document-picker';
+import XLSX from 'xlsx';
+
 import RNFS from 'react-native-fs';
 import {Dropdown} from 'react-native-element-dropdown';
 import axios from 'axios';
@@ -47,6 +53,7 @@ export default function AddCategory({navigation}: any) {
       data: [],
     },
   ]);
+  const [productUploadData, setProductUploadData] = useState<any>(null);
   async function signIn() {
     try {
       await GoogleSignin.hasPlayServices();
@@ -62,6 +69,11 @@ export default function AddCategory({navigation}: any) {
       console.error(error, 'eeeeeeeeeeeeeeeeeerrrrrrrrrrrrrrrrr');
     }
   }
+  useEffect(() => {
+    if (Platform.OS === 'android') {
+      UIManager.setLayoutAnimationEnabledExperimental(true);
+    }
+  }, []);
   useEffect(() => {
     async function signIn() {
       try {
@@ -94,6 +106,7 @@ export default function AddCategory({navigation}: any) {
   const [photoList, setPhotoList] = useState<any>([]);
   const [imageIds, setImageIds] = useState<any>([]);
   const [isUpLoading, setIsUploading] = useState<boolean>(false);
+  const [singleFile, setSingleFile] = useState<any>(null);
 
   const openActionSheet = async () => {
     if (Platform.OS == 'ios') {
@@ -162,6 +175,50 @@ export default function AddCategory({navigation}: any) {
       );
     }
   }
+  const selectFile = async () => {
+    try {
+      const res = await DocumentPicker.pick({
+        // Provide which type of file you want user to pick
+        type: [DocumentPicker.types.allFiles],
+        // There can me more options as well
+        // DocumentPicker.types.allFiles
+        // DocumentPicker.types.images
+        // DocumentPicker.types.plainText
+        // DocumentPicker.types.audio
+        // DocumentPicker.types.pdf
+      });
+      setSingleFile(res);
+      console.log('FILEEEEEEEE', res);
+    } catch (err) {
+      setSingleFile(null);
+      console.log('----->Error', err);
+    }
+  };
+  const useExcel = async () => {
+    const filePath =
+      singleFile && singleFile.length && singleFile[0]?.uri
+        ? singleFile[0]?.uri
+        : '';
+    console.log('filePath', filePath);
+    try {
+      const fileContent = await RNFS.readFile(filePath, 'base64');
+      const workbook = XLSX.read(fileContent, {type: 'base64'});
+      const sheetName = workbook.SheetNames[0];
+
+      const sheetData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
+      console.log('{====>FILE CONTENT}', sheetName, sheetData);
+
+      const groupedData = {};
+      sheetData.map((i: any, index: number) => {
+        i.isExpanded = false;
+        i.index = index + 1;
+      });
+      setProductUploadData(sheetData);
+    } catch (error) {
+      console.error('Error reading Excel file:', error);
+    }
+  };
+
   //UPLOAD TO GOOGLE PHOTOS
   // async function uploadToGooglePhotos(photo: any) {
   //   const accessToken = await signIn();
@@ -402,6 +459,79 @@ export default function AddCategory({navigation}: any) {
       </View>
     );
   };
+
+  const RenderContent = ({item, index}: any) => {
+    // const [isExpanded, setIsExpanded] = useState(item.isExpanded);
+    return (
+      <>
+        <TouchableOpacity
+          style={{
+            padding: 12,
+            borderTopRightRadius: 10,
+            borderTopLeftRadius: 10,
+            borderBottomLeftRadius: item.isExpanded ? 0 : 10,
+            borderBottomRightRadius: item.isExpanded ? 0 : 10,
+            backgroundColor: item.isExpanded ? '#D6EAF8' + 60 : '#f8f8f8',
+            // color: '#eee',
+            flex: 1,
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            borderColor: '#003c98' + 30,
+            borderWidth: item.isExpanded ? 0 : 1.2,
+          }}
+          onPress={() => {
+            let new_data = [...productUploadData];
+            new_data.map((i: any) => {
+              if (item.index == i.index) {
+                i.isExpanded = !i.isExpanded;
+              } else {
+                i.isExpanded = false;
+              }
+            });
+            setProductUploadData(new_data);
+          }}>
+          <Text>{`Product ${index + 1}`}</Text>
+        </TouchableOpacity>
+        {item.isExpanded && (
+          <View
+            style={{
+              // marginLeft: 15,
+              paddingVertical: 5,
+              backgroundColor: '#f8f8f8',
+              // marginTop: 4,
+              borderBottomRightRadius: 10,
+              borderBottomLeftRadius: 10,
+            }}>
+            <Text style={{marginLeft: 15}}>
+              Product Name: {item.Product_name}
+            </Text>
+            <Text style={{marginLeft: 15}}>Brand: {item.company_name}</Text>
+            <Text style={{marginLeft: 15}}>
+              Description: {item.Product_description}
+            </Text>
+            <Text style={{marginLeft: 15}}>Prize: {item.prize}</Text>
+            <Text style={{marginLeft: 15}}>
+              Discount: {`${item.discount}%`}
+            </Text>
+            <View style={{flexDirection: 'row'}}>
+              <Text style={{marginLeft: 15}}>Size:</Text>
+              <FlatList
+                data={JSON.parse(item.size_list)}
+                horizontal
+                renderItem={({item: items, index}) => {
+                  return (
+                    <View>
+                      <Text>{items.size}</Text>
+                    </View>
+                  );
+                }}
+              />
+            </View>
+          </View>
+        )}
+      </>
+    );
+  };
   return (
     <KeyboardAvoidingView
       style={{flex: 1}}
@@ -459,18 +589,12 @@ export default function AddCategory({navigation}: any) {
             isTextInput={false}
             isDropDown={false}
             dropDownData={dropdownData}
-            placeholder={[
-              'First Name',
-              'Last Name',
-              'Email',
-              'Contact Number',
-              'Password',
-            ]}
+            // placeholder={[]}
             // textInputCount={5}
             onSubmitClick={() => openActionSheet()}
             buttonView={false}>
             <>
-              <ScrollView
+              {/* <ScrollView
                 contentContainerStyle={{
                   flexDirection: 'row',
                   margin: 5,
@@ -535,8 +659,18 @@ export default function AddCategory({navigation}: any) {
                     </TouchableOpacity>
                   </View>
                 ))}
-              </ScrollView>
-
+              </ScrollView> */}
+              <FlatList
+                data={productUploadData}
+                style={{width: '100%'}}
+                renderItem={({item, index}) => {
+                  return (
+                    <>
+                      <RenderContent item={item} index={index} />
+                    </>
+                  );
+                }}
+              />
               <View
                 style={{
                   marginTop: 10,
@@ -544,7 +678,7 @@ export default function AddCategory({navigation}: any) {
                   flexDirection: 'row',
                   justifyContent: 'flex-end',
                 }}>
-                <TouchableOpacity
+                {/* <TouchableOpacity
                   style={{
                     width: '30%',
                     backgroundColor: '#1976D2',
@@ -566,8 +700,33 @@ export default function AddCategory({navigation}: any) {
                   <Text style={{color: 'white', fontSize: 16}}>
                     Select Image
                   </Text>
+                </TouchableOpacity> */}
+                <TouchableOpacity
+                  style={{
+                    width: '35%',
+                    backgroundColor: '#1976D2',
+                    padding: 8,
+                    elevation: 2,
+                    borderRadius: 5,
+                    alignItems: 'center',
+                    // height: 40,
+                    // shadowColor: '#000',
+                    shadowOffset: {
+                      width: 0,
+                      height: 1,
+                    },
+                    shadowOpacity: 0.2,
+                    shadowRadius: 1.41,
+                    marginLeft: 8,
+                  }}
+                  onPress={() => {
+                    singleFile ? useExcel() : selectFile();
+                  }}>
+                  <Text style={{color: 'white', fontSize: 18}}>
+                    Upload Excel
+                  </Text>
                 </TouchableOpacity>
-                {photoList.length > 0 && (
+                {/* {photoList.length > 0 && (
                   <TouchableOpacity
                     style={{
                       width: '35%',
@@ -595,7 +754,7 @@ export default function AddCategory({navigation}: any) {
                       </Text>
                     )}
                   </TouchableOpacity>
-                )}
+                )} */}
               </View>
             </>
           </CardView>
@@ -615,4 +774,40 @@ export default function AddCategory({navigation}: any) {
   );
 }
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  dropdown: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    width: '48%',
+    // flex: 1,
+  },
+  icon: {
+    marginRight: 5,
+  },
+  label: {
+    position: 'absolute',
+    backgroundColor: 'white',
+    left: 22,
+    top: 8,
+    zIndex: 999,
+    paddingHorizontal: 8,
+    fontSize: 14,
+  },
+  placeholderStyle: {
+    fontSize: 16,
+  },
+  selectedTextStyle: {
+    fontSize: 16,
+  },
+  iconStyle: {
+    width: 20,
+    height: 20,
+  },
+  inputSearchStyle: {
+    height: 40,
+    fontSize: 16,
+  },
+});
