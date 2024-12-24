@@ -594,7 +594,7 @@ export default function AddCategory({navigation}: any) {
             onSubmitClick={() => openActionSheet()}
             buttonView={false}>
             <>
-              {/* <ScrollView
+              <ScrollView
                 contentContainerStyle={{
                   flexDirection: 'row',
                   margin: 5,
@@ -659,7 +659,7 @@ export default function AddCategory({navigation}: any) {
                     </TouchableOpacity>
                   </View>
                 ))}
-              </ScrollView> */}
+              </ScrollView>
               <FlatList
                 data={productUploadData}
                 style={{width: '100%'}}
@@ -678,7 +678,7 @@ export default function AddCategory({navigation}: any) {
                   flexDirection: 'row',
                   justifyContent: 'flex-end',
                 }}>
-                {/* <TouchableOpacity
+                <TouchableOpacity
                   style={{
                     width: '30%',
                     backgroundColor: '#1976D2',
@@ -700,8 +700,9 @@ export default function AddCategory({navigation}: any) {
                   <Text style={{color: 'white', fontSize: 16}}>
                     Select Image
                   </Text>
-                </TouchableOpacity> */}
-                <TouchableOpacity
+                </TouchableOpacity>
+                {/* Excel Upload and data read  */}
+                {/* <TouchableOpacity
                   style={{
                     width: '35%',
                     backgroundColor: '#1976D2',
@@ -725,8 +726,8 @@ export default function AddCategory({navigation}: any) {
                   <Text style={{color: 'white', fontSize: 18}}>
                     Upload Excel
                   </Text>
-                </TouchableOpacity>
-                {/* {photoList.length > 0 && (
+                </TouchableOpacity> */}
+                {photoList.length > 0 && (
                   <TouchableOpacity
                     style={{
                       width: '35%',
@@ -754,11 +755,11 @@ export default function AddCategory({navigation}: any) {
                       </Text>
                     )}
                   </TouchableOpacity>
-                )} */}
+                )}
               </View>
             </>
           </CardView>
-          {imageIds.length > 0 &&
+          {/* {imageIds.length > 0 &&
             imageIds.map((i: any) => {
               console.log('-->>', i.id);
               return (
@@ -766,7 +767,7 @@ export default function AddCategory({navigation}: any) {
                   <ImageItem item={i} />
                 </View>
               );
-            })}
+            })} */}
         </ScrollView>
         {OpenImageModal ? ImagePickerModal() : null}
       </View>

@@ -1,5 +1,7 @@
 import {
+  Alert,
   Animated,
+  BackHandler,
   Image,
   ImageBackground,
   Pressable,
@@ -10,11 +12,11 @@ import {
   Vibration,
   View,
 } from 'react-native';
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import Modal from 'react-native-modal';
 import {Fonts} from '../../utils/assets/fonts';
 import FloatingTextInput from './FloatingTextInput';
-
+import auth from '@react-native-firebase/auth';
 interface LoginModalProps {
   modalIsVisible: boolean;
   onClose: () => void;
@@ -22,13 +24,25 @@ interface LoginModalProps {
 export default function LoginModal(props: LoginModalProps) {
   const {modalIsVisible = false, onClose} = props;
   const fadeAnim = useRef(new Animated.Value(1)).current;
-
+  const [confirm, setConfirm] = useState(null);
   const [isRegister, setIsRegister] = useState<boolean>(false);
   const scaleValue = useRef(new Animated.Value(1)).current;
   const scaleValueFacebook = useRef(new Animated.Value(1)).current;
   const scaleValueLogin = useRef(new Animated.Value(1)).current;
   const scaleValueRegis = useRef(new Animated.Value(1)).current;
-
+  useEffect(() => {
+    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
+    return subscriber; // unsubscribe on unmount
+  }, []);
+  function onAuthStateChanged(user: any) {
+    if (user) {
+      console.log('USERRRRR--->', user);
+      // Some Android devices can automatically process the verification code (OTP) message, and the user would NOT need to enter the code.
+      // Actually, if he/she tries to enter it, he/she will get an error message because the code was already used in the background.
+      // In this function, make sure you hide the component(s) for entering the code and/or navigate away from this screen.
+      // It is also recommended to display a message to the user informing him/her that he/she has successfully logged in.
+    }
+  }
   const onPressIn = (item: any) => {
     Animated.spring(item, {
       toValue: 0.95,
@@ -64,16 +78,36 @@ export default function LoginModal(props: LoginModalProps) {
       </>
     );
   };
-  const onLoginPress = (loginCred: any) => {
-    console.log('------->>>', loginCred);
-    let reg = /^\d+$/;
-    console.log(reg.test(loginCred.cred));
-    const payload = {
-      [reg.test(loginCred.cred) ? 'contact_number' : 'email']: loginCred.cred,
-      password: loginCred.password,
-    };
-    console.log('--payload', payload);
+  const onLoginPress = async (loginCred: any) => {
+    console.log('fdere4rer');
+    // console.log('------->>>', loginCred);
+    // let reg = /^\d+$/;
+    // console.log(reg.test(loginCred.cred));
+    // const payload = {
+    //   [reg.test(loginCred.cred) ? 'contact_number' : 'email']: loginCred.cred,
+    //   password: loginCred.password,
+    // };
+    // console.log('--payload', payload);
+    // BackHandler.exitApp();
+    let confirmation;
+    try {
+      confirmation = await auth().signInWithPhoneNumber('+919265914774');
+    } catch (error) {
+      Alert.alert(error.message);
+      console.log('Error during sign-in:', error.message);
+      return;
+    }
+    Alert.alert(confirmation);
+    // setConfirm(confirmation);
+    console.log('confirmartion', JSON.stringify(confirmation));
   };
+  async function onVerify(loginCred: any) {
+    try {
+      await confirm.confirm(123456);
+    } catch (error) {
+      console.log('Invalid code.');
+    }
+  }
 
   const LoginComponent = () => {
     const [loginCred, setLoginCred] = useState<object>({});
@@ -87,7 +121,7 @@ export default function LoginModal(props: LoginModalProps) {
             setLoginCred(newObj);
           }}
         />
-        <FloatingTextInput
+        {/* <FloatingTextInput
           label="Password"
           secureTextEntry={true}
           onChangeText={data => {
@@ -95,7 +129,7 @@ export default function LoginModal(props: LoginModalProps) {
             console.log('---ee--', newObj);
             setLoginCred(newObj);
           }}
-        />
+        /> */}
         <Pressable
           onPressIn={() => onPressIn(scaleValueLogin)}
           onPressOut={() => onPressOut(scaleValueLogin)}
@@ -109,6 +143,29 @@ export default function LoginModal(props: LoginModalProps) {
               {transform: [{scale: scaleValueLogin}]},
             ]}>
             <Text style={styles.buttonText}>Login...</Text>
+          </Animated.View>
+        </Pressable>
+        <FloatingTextInput
+          label="OTP"
+          onChangeText={data => {
+            let newObj = {...loginCred, ['OTP']: data};
+            console.log('-----', newObj);
+            setLoginCred(newObj);
+          }}
+        />
+        <Pressable
+          // onPressIn={() => onPressIn(scaleValueLogin)}
+          // onPressOut={() => onPressOut(scaleValueLogin)}
+          onPress={() => {
+            onVerify(loginCred);
+          }}>
+          <Animated.View
+            style={[
+              styles.buttonContent,
+              styles.button,
+              {transform: [{scale: scaleValueLogin}]},
+            ]}>
+            <Text style={styles.buttonText}>VERIFY...</Text>
           </Animated.View>
         </Pressable>
       </>

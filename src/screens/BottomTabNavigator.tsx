@@ -77,7 +77,8 @@ export default function BottomTabNavigator({navigation}: any) {
                 <TouchableOpacity
                   style={styles.button}
                   onPress={() => {
-                    navigate('AddCategory');
+                    // navigate('AddCategory');
+                    navigate('Demo');
                   }}>
                   <Text
                     style={{
@@ -97,7 +98,7 @@ export default function BottomTabNavigator({navigation}: any) {
         <CurvedBottomBar.Screen
           name="Home"
           position="LEFT"
-          component={() => <Home navigation={navigation}/>}
+          component={() => <Home navigation={navigation} />}
         />
         <CurvedBottomBar.Screen
           name="Profile"

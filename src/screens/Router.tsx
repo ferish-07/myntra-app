@@ -14,6 +14,7 @@ import Home from './Home';
 import Products from './Product/Products';
 import ProductDetails from './Product/ProductDetails';
 import SizeChart from './Product/SizeChart';
+import Demo from './Demo.tsx';
 
 export default function Router() {
   const Stack = createNativeStackNavigator();
@@ -30,6 +31,7 @@ export default function Router() {
         <Stack.Screen name="Products" component={Products} />
         <Stack.Screen name="Product_details" component={ProductDetails} />
         <Stack.Screen name="SizeChart" component={SizeChart} />
+        <Stack.Screen name="Demo" component={Demo} />
       </Stack.Navigator>
     </NavigationContainer>
   );

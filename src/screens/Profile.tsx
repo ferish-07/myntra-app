@@ -178,7 +178,8 @@ export default function Profile({navigation}: any) {
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-between',
-          }}>
+          }}
+          onPress={() => navigation.navigate('Demo')}>
           <View
             style={{
               flexDirection: 'row',
