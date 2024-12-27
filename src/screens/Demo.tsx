@@ -15,6 +15,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {GDrive} from '@robinbobin/react-native-google-drive-api-wrapper';
 import axios from 'axios';
 import RNBlobUtil from 'react-native-blob-util';
+import CircularProgress from 'react-native-circular-progress-indicator';
+import ViewFileModal from './Common/ViewFileModal';
+import FileViewer from 'react-native-file-viewer';
 type Item = {
   [key: string]: any;
 };
@@ -25,6 +28,7 @@ const RenderData = ({
   getDriveFiles,
   progressPercent,
   checkFileExistace,
+  viewFile,
 }: // isDownloading,
 {
   item: Item;
@@ -32,6 +36,7 @@ const RenderData = ({
   getDriveFiles: (item: string, filename: string) => Promise<boolean>;
   progressPercent: number;
   checkFileExistace: (item: string) => Promise<boolean>;
+  viewFile: (item: string) => void;
   // isDownloading: {};
 }) => {
   const [isDownloading, setIsDownloading] = useState(false);
@@ -67,35 +72,40 @@ const RenderData = ({
           padding: 5,
         }}
         onPress={async () => {
-          // await AsyncStorage.clear()
-          const access_token = await AsyncStorage.getItem('access_token');
-          let accessToken: any;
-          if (access_token) {
-            accessToken = access_token;
-            const userInfo = await GoogleSignin.getCurrentUser();
-            // getDriveFiles(item.data, item.title);\
-            setIsDownloading(true);
-            try {
-              await getDriveFiles(item.data, item.title);
-              // setIsDownloaded(true);
-            } catch (error) {
-              console.error('Download failed:', error);
-            } finally {
-              setIsDownloading(false);
-            }
+          if (isExits && !isDownloading) {
+            viewFile(item.title);
           } else {
-            accessToken = await signIn();
-            await AsyncStorage.setItem(
-              'access_token',
-              JSON.stringify(accessToken),
-            );
+            // await AsyncStorage.clear()
+            const access_token = await AsyncStorage.getItem('access_token');
+            let accessToken: any;
+            if (access_token) {
+              accessToken = access_token;
+              const userInfo = await GoogleSignin.getCurrentUser();
+              // getDriveFiles(item.data, item.title);\
+              setIsDownloading(true);
+              try {
+                await getDriveFiles(item.data, item.title);
+                // setIsDownloaded(true);
+              } catch (error) {
+                console.error('Download failed:', error);
+              } finally {
+                console.log('finalyyy......');
+                setIsDownloading(false);
+              }
+            } else {
+              accessToken = await signIn();
+              await AsyncStorage.setItem(
+                'access_token',
+                JSON.stringify(accessToken),
+              );
+            }
           }
         }}>
         <>
-          {console.log('isExits', isExits)}
-          {isExits ? (
+          {/* {console.log('isExits', isExits)} */}
+          {isExits && !isDownloading ? (
             <>
-              <Text>d</Text>
+              <Text>View</Text>
             </>
           ) : !isDownloading ? (
             <Text
@@ -106,13 +116,22 @@ const RenderData = ({
               {'download'}
             </Text>
           ) : (
-            <Text
-              style={{
-                fontFamily: Fonts.myntra,
-                fontSize: 18,
-              }}>
-              {'download-completed'}
-            </Text>
+            //Loader
+            <CircularProgress
+              radius={8}
+              inActiveStrokeWidth={5}
+              activeStrokeWidth={5}
+              value={progressPercent}
+              inActiveStrokeColor={'#2ecc71'}
+              inActiveStrokeOpacity={0.2}
+              progressValueColor={'red'}
+              valueSuffix={'%'}
+              showProgressValue={false}
+              onAnimationComplete={() => {
+                // alert('callback');
+                console.log('-->> compeleted');
+              }}
+            />
           )}
         </>
       </TouchableOpacity>
@@ -132,6 +151,8 @@ const Demo = () => {
   ];
   const [progressPercent, setProgressPercent] = useState(0);
   const [isDownloading, setIsDownloading] = useState({});
+  const [viewFile, setViewFile] = useState(false);
+  const [filepath, setFilePath] = useState({});
   async function fetchDriveFiles() {
     try {
       // Sign in to get the user's access token
@@ -161,10 +182,10 @@ const Demo = () => {
     }
   }
 
-  const downloadPDF = async () => {
+  const downloadPDF = async (file_data: any, file_name: string) => {
     try {
       // Define the path where you want to save the PDF
-      const filePath = `${RNBlobUtil.fs.dirs.DocumentDir}/Myntra/${'doc.pdf'}`;
+      const filePath = `${RNBlobUtil.fs.dirs.DocumentDir}/Myntra/${file_name}.pdf`;
 
       // Start downloading the PDF from the URL
       const res = await RNBlobUtil.config({
@@ -174,6 +195,7 @@ const Demo = () => {
         .fetch('GET', 'https://files.testfile.org/PDF/100MB-TESTFILE.ORG.pdf')
         .progress((recieved, total) => {
           let procressPercents = (recieved / total) * 100;
+          console.log('perc', procressPercents);
           setProgressPercent(procressPercents);
         }); // Make the GET request to fetch the file
 
@@ -182,6 +204,8 @@ const Demo = () => {
 
       // Get the path of the downloaded file
       const path = res.path(); // The file's path after download
+      console.log('-------path', path);
+      setFilePath(path);
 
       // Check if the file exists at the given path
       const fileExists = await RNBlobUtil.fs.exists(path);
@@ -220,7 +244,7 @@ const Demo = () => {
   ) => {
     try {
       // Path to the app's Documents directory
-      console.log('file_name------', file_name);
+      // console.log('file_name------', file_name);
       // let file_name = 'OL';
       const documentsPath =
         Platform.OS == 'ios'
@@ -233,16 +257,16 @@ const Demo = () => {
 
       // Check and create folder
       const folderExists = await RNBlobUtil.fs.exists(folderPath);
-      console.log('fileName-=-', fileName);
+      // console.log('fileName-=-', fileName);
       if (!folderExists) {
         await RNBlobUtil.fs.mkdir(folderPath);
         console.log('Folder created at:', folderPath);
       }
 
       // Write the file
-      console.log('filePath 11', filePath);
+      // console.log('filePath 11', filePath);
       await RNBlobUtil.fs.writeFile(filePath, base64String, 'base64');
-      console.log('filePath 22', filePath);
+      // console.log('filePath 22', filePath);
 
       // Confirm the file exists
       const fileExists = await RNBlobUtil.fs.exists(filePath);
@@ -264,6 +288,7 @@ const Demo = () => {
     }
   };
   const checkFileExistace = async (title: string) => {
+    console.log('----chrekcv', title);
     const documentsPath =
       Platform.OS == 'ios'
         ? RNBlobUtil.fs.dirs.DocumentDir
@@ -274,13 +299,13 @@ const Demo = () => {
     const filePath = `${folderPath}/${fileName}`;
 
     // Check and create folder
-    console.log('filePath', filePath);
+    // console.log('filePath', filePath);
     const fileExists = await RNBlobUtil.fs.exists(filePath);
     if (fileExists) return true;
   };
 
   const readFileContent = async (fileId: string, fileName: string) => {
-    console.log('fileeee idd', fileId);
+    // console.log('fileeee idd', fileId);
     let file_id = fileId.toString();
     setIsDownloading({fileId: fileId, downloading: true});
     const accessToken = await signIn();
@@ -295,8 +320,8 @@ const Demo = () => {
         },
         responseType: 'text', // We expect plain text content
       });
-      console.log('file urllll----', file_id, fileUrl);
-      console.log('=------------------=don', JSON.stringify(response));
+      console.log('file urllll----', fileUrl);
+      // console.log('=------------------=don', JSON.stringify(response));
       savePDF(response.data, fileName, fileId);
       // setFileContent(response.data); // Save file content in state
       // Alert.alert('File Content Loaded');
@@ -350,12 +375,37 @@ const Demo = () => {
     } catch (error) {
       console.error(error, 'eeeeeeeeeeeeeeeeeerrrrrrrrrrrrrrrrr Fer');
       await AsyncStorage.removeItem('access_token');
-      setTimeout(() => {
-        signIn();
+      setTimeout(async () => {
+        let access_token: any;
+        access_token = await signIn();
+        await AsyncStorage.setItem('access_token', access_token);
       }, 1000);
     }
   }
-
+  const onClose = () => {
+    setViewFile(false);
+  };
+  const ViewFiles = async (title: string) => {
+    const documentsPath =
+      Platform.OS == 'ios'
+        ? RNBlobUtil.fs.dirs.DocumentDir
+        : RNBlobUtil.fs.dirs.DownloadDir;
+    const folderName = 'Myntra';
+    const fileName = `${title}.pdf`;
+    const folderPath = `${documentsPath}/${folderName}`;
+    const filePath = `${folderPath}/${fileName}`;
+    // console.log('----', filePath);
+    // let fileP = {path: filePath, name: title};
+    // setFilePath(fileP);
+    // setViewFile(true);
+    await FileViewer.open(filePath, {showOpenWithDialog: true}) // absolute-path-to-my-local-file.
+      .then(() => {
+        // success
+      })
+      .catch(error => {
+        // error
+      });
+  };
   return (
     <View>
       <FlatList
@@ -367,10 +417,17 @@ const Demo = () => {
             getDriveFiles={readFileContent}
             progressPercent={progressPercent}
             checkFileExistace={async item => await checkFileExistace(item)}
+            viewFile={ViewFiles}
             // isDownloading={isDownloading}
           />
         )}
-        style={{height: '90%'}}
+        style={{height: '50%'}}
+      />
+      <ViewFileModal
+        isVisible={viewFile}
+        onClose={onClose}
+        filepath={filepath}
+        title=""
       />
     </View>
   );
