@@ -4,6 +4,7 @@ import {
   BackHandler,
   Image,
   ImageBackground,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -31,8 +32,10 @@ export default function LoginModal(props: LoginModalProps) {
   const scaleValueLogin = useRef(new Animated.Value(1)).current;
   const scaleValueRegis = useRef(new Animated.Value(1)).current;
   useEffect(() => {
-    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
-    return subscriber; // unsubscribe on unmount
+    if (Platform.OS == 'ios') {
+      const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
+      return subscriber; // unsubscribe on unmount
+    }
   }, []);
   function onAuthStateChanged(user: any) {
     if (user) {
@@ -59,10 +62,10 @@ export default function LoginModal(props: LoginModalProps) {
   const RegistrationComponent = () => {
     return (
       <>
-        <FloatingTextInput label="Full Name" />
-        <FloatingTextInput label="Email/Mobile Number" />
-        <FloatingTextInput label="Password" secureTextEntry={true} />
-        <FloatingTextInput label="Confirm Password" secureTextEntry={true} />
+        {/* <FloatingTextInput label="Full Name"  onChangeText={setFull}/> */}
+        {/* <FloatingTextInput label="Email/Mobile Number" /> */}
+        {/* <FloatingTextInput label="Password" secureTextEntry={true} /> */}
+        {/* <FloatingTextInput label="Confirm Password" secureTextEntry={true} /> */}
         <Pressable
           onPressIn={() => onPressIn(scaleValueRegis)}
           onPressOut={() => onPressOut(scaleValueRegis)}>
@@ -92,18 +95,18 @@ export default function LoginModal(props: LoginModalProps) {
     let confirmation;
     try {
       confirmation = await auth().signInWithPhoneNumber('+919265914774');
-    } catch (error) {
+    } catch (error: any) {
       Alert.alert(error.message);
       console.log('Error during sign-in:', error.message);
       return;
     }
-    Alert.alert(confirmation);
+    // Alert.alert("error",confirmation);
     // setConfirm(confirmation);
     console.log('confirmartion', JSON.stringify(confirmation));
   };
   async function onVerify(loginCred: any) {
     try {
-      await confirm.confirm(123456);
+      // await confirm.confirm(123456);
     } catch (error) {
       console.log('Invalid code.');
     }

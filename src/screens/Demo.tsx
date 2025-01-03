@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from 'react';
+
 import {
   View,
   Text,
@@ -8,6 +9,7 @@ import {
   Alert,
   Platform,
   PermissionsAndroid,
+  Linking,
 } from 'react-native';
 import {Fonts} from '../utils/assets/fonts';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
@@ -29,20 +31,17 @@ const RenderData = ({
   progressPercent,
   checkFileExistace,
   viewFile,
-}: // isDownloading,
-{
+}: {
   item: Item;
   signIn: () => void;
-  getDriveFiles: (item: string, filename: string) => Promise<boolean>;
+  getDriveFiles: (item: string, filename: string) => void;
   progressPercent: number;
   checkFileExistace: (item: string) => Promise<boolean>;
   viewFile: (item: string) => void;
-  // isDownloading: {};
 }) => {
   const [isDownloading, setIsDownloading] = useState(false);
-  // const [isDownloaded, setIsDownloaded] = useState(false);
+  const [isExits, setIsExits] = useState(false);
 
-  const [isExits, setIsExits] = useState<boolean | null>(null);
   useEffect(() => {
     const checkExistence = async () => {
       const exists = await checkFileExistace(item.title);
@@ -51,6 +50,7 @@ const RenderData = ({
     checkExistence();
     // setIsDownloadings(isDownloading);
   }, [item.title, checkFileExistace, isDownloading]);
+
   return (
     <View
       style={{
@@ -81,10 +81,10 @@ const RenderData = ({
             if (access_token) {
               accessToken = access_token;
               const userInfo = await GoogleSignin.getCurrentUser();
-              // getDriveFiles(item.data, item.title);\
+              // getDriveFiles(item.data, item.title);
               setIsDownloading(true);
               try {
-                await getDriveFiles(item.data, item.title);
+                await getDriveFiles(item.downloadLink, item.title);
                 // setIsDownloaded(true);
               } catch (error) {
                 console.error('Download failed:', error);
@@ -143,10 +143,19 @@ const Demo = () => {
     {
       title: 'OL',
       data: '12Nx4AV-tekx-yTGJHosaAFT79faOkJaS',
+      downloadLink:
+        'https://drive.usercontent.google.com/u/0/uc?id=1p0UJwYVLkqzDKtVvAwh8ruJppiAD5jCE&export=download',
     },
     {
       title: 'Info_Sheet',
       data: '1ScPDjI2hMMR0aC2CiViESSGk2RZZep7W',
+      downloadLink:
+        'https://drive.usercontent.google.com/u/0/uc?id=1P0cELaImxf3Zrji_0wd-aWAKlSHpg_6I&export=download',
+    },
+    {
+      title: '100_MB_FILE',
+      data: '1ScPDjI2hMMR0aC2CiViESSGk2RZZep7W',
+      downloadLink: 'https://files.testfile.org/PDF/100MB-TESTFILE.ORG.pdf',
     },
   ];
   const [progressPercent, setProgressPercent] = useState(0);
@@ -181,62 +190,196 @@ const Demo = () => {
       console.error('Error fetching files:', error);
     }
   }
-
-  const downloadPDF = async (file_data: any, file_name: string) => {
+  const downloadPDFIOs = async (file_data: any, file_name: string) => {
     try {
-      // Define the path where you want to save the PDF
-      const filePath = `${RNBlobUtil.fs.dirs.DocumentDir}/Myntra/${file_name}.pdf`;
+      // For Android, we'll use the Download directory to ensure visibility in Files app
+      const documentsPath = RNBlobUtil.fs.dirs.DocumentDir;
 
-      // Start downloading the PDF from the URL
+      const fileName = `${file_name}.pdf`;
+      // For Android, save directly to Downloads folder without subfolder
+      const filePath = `${documentsPath}/Myntra/${fileName}`;
+
+      // Create Myntra folder only for iOS
+
+      const folderPath = `${documentsPath}/Myntra`;
+      const folderExists = await RNBlobUtil.fs.exists(folderPath);
+      if (!folderExists) {
+        await RNBlobUtil.fs.mkdir(folderPath);
+      }
+
       const res = await RNBlobUtil.config({
-        fileCache: true, // Cache the file on disk
+        fileCache: true,
         path: filePath,
       })
-        .fetch('GET', 'https://files.testfile.org/PDF/100MB-TESTFILE.ORG.pdf')
-        .progress((recieved, total) => {
-          let procressPercents = (recieved / total) * 100;
-          console.log('perc', procressPercents);
-          setProgressPercent(procressPercents);
-        }); // Make the GET request to fetch the file
+        .fetch('GET', file_data)
+        .progress((received: any, total: any) => {
+          const progressPercent = (received / total) * 100;
+          console.log('progress', progressPercent);
+          setProgressPercent(progressPercent);
+        });
 
-      // Save the downloaded file to the specified path
-      // await res.flush(); // Ensure the file is written to disk
-
-      // Get the path of the downloaded file
-      const path = res.path(); // The file's path after download
-      console.log('-------path', path);
+      const path = res.path();
+      console.log('Download path:', path);
       setFilePath(path);
 
-      // Check if the file exists at the given path
       const fileExists = await RNBlobUtil.fs.exists(path);
-
       if (fileExists) {
-        Alert.alert('Download Complete', `File saved at: ${path}`);
+        // Trigger media scanner to make file visible immediately
+        if (Platform.OS === 'android') {
+          await RNBlobUtil.fs.scanFile([
+            {path: filePath, mime: 'application/pdf'},
+          ]);
+        }
+        Alert.alert('Download Complete', `File saved successfully`);
       } else {
         Alert.alert('Download Failed', 'The file could not be saved.');
       }
-    } catch (error) {
-      // Handle download error
+    } catch (error: any) {
       Alert.alert(
         'Download Error',
         `Failed to download file: ${error.message}`,
       );
     }
   };
-  const requestStoragePermission = async () => {
-    if (Platform.OS === 'android') {
+  const mediaDownloadAndroid = async (file_data: any, file_name: string) => {
+    console.log('file_name==>', file_name);
+    // const {config, fs} = RNBlobUtil;
+
+    let andPath = RNBlobUtil.fs.dirs.DownloadDir + '/' + `${file_name}`;
+    //    iosPath = fs.dirs.DocumentDir + '/' + `${broadcastId}_${filename}`;
+
+    let fileConfigOptions = {
+      fileCache: true,
+      path: andPath,
+      addAndroidDownloads: {
+        useDownloadManager: true,
+        notification: true,
+        title: `${file_name}`,
+        path: andPath,
+        description: 'Broadcast Media',
+      },
+    };
+    let downloadPath = `file:///storage/emulated/0/Download/Myntra/${file_name}.pdf`;
+    let fileExists = await RNBlobUtil.fs.exists(downloadPath);
+
+    //console.log("DownloadPath==>", downloadPath);
+    //console.log("File Exist==>", fileExists);
+
+    if (!fileExists) {
+      let res = await RNBlobUtil.config(fileConfigOptions)
+        .fetch('GET', file_data)
+        .progress((received: any, total: any) => {
+          const progressPercent = (received / total) * 100;
+          console.log('progress', progressPercent);
+          setProgressPercent(progressPercent);
+        });
+
+      //console.log("res -> ", JSON.stringify(res));
+
+      if (Platform.OS === 'android') {
+        let result = await RNBlobUtil.MediaCollection.copyToMediaStore(
+          {
+            name: `${file_name}.pdf`, // name of the file
+
+            parentFolder: 'Myntra',
+
+            // type: 'base64',
+
+            mimeType: `files/${'pdf'}`, // MIME type of the file
+          },
+
+          'Download', // Media Collection to store the file in ("Audio" | "Image" | "Video" | "Download")
+
+          res.path(),
+        );
+      }
+
+      // setProgress(100);
+      // completeDownload(downloadurl, broadcastId);
+
+      Alert.alert('Success', 'File Downloaded Successfully..', [
+        {text: 'OK', onPress: () => {}},
+        {
+          text: 'View',
+          onPress: () => {
+            FileViewer.open(downloadPath, {
+              showOpenWithDialog: true,
+            }) // absolute-path-to-my-local-file.
+              .then(() => {
+                // success
+                //console.log("sucess");
+              })
+              .catch(error => {
+                // error
+                //console.log("error", error);
+                Alert.alert('Error', error.message);
+              });
+          },
+        },
+      ]);
+    } else {
+      Alert.alert('Success', 'File already exists in the storage..', [
+        {text: 'OK', onPress: () => {}},
+        {
+          text: 'View',
+          onPress: () => {
+            FileViewer.open(downloadPath, {showOpenWithDialog: true}) // absolute-path-to-my-local-file.
+              .then(() => {
+                // success
+                //console.log("sucess");
+              })
+              .catch(error => {
+                // error
+                //console.log("error", error);
+                Alert.alert('Error', error.message);
+              });
+          },
+        },
+      ]);
+      // completeDownload(downloadurl, broadcastId);
+    }
+  };
+
+  const checkPermission = async (file_data: string, fileName: string) => {
+    //console.log("Check Permission................", downloadurl);
+    if (Platform.OS === 'ios') {
+      await downloadPDFIOs(file_data, fileName);
+    } else {
       const granted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
         {
-          title: 'Storage Permission',
-          message: 'App needs access to storage to save files',
+          title: 'Storage Permission Required',
+          message: 'Application needs access to your storage to download File',
+          buttonPositive: 'Change Permission',
         },
       );
-      console.log('granted', granted);
-      return granted === PermissionsAndroid.RESULTS.GRANTED;
+
+      console.log(
+        'granted=-=-=->',
+        granted,
+        (Platform.constants as any)['Release'] >= 13,
+      );
+      if ((Platform.constants as any)['Release'] >= 13) {
+        await mediaDownloadAndroid(file_data, fileName);
+      } else if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        await mediaDownloadAndroid(file_data, fileName);
+        //console.log("Storage Permission Granted.");
+      } else {
+        // If permission denied then show alert
+        Alert.alert('Error', 'Storage Permission Not Granted', [
+          {
+            text: 'OKAY',
+            onPress: () => {
+              // let fileName = decodeURI(downloadurl.split("/").pop());
+              // errorDownload(fileName);
+              console.log('---err');
+            },
+          },
+        ]);
+      }
     }
-    return true; // No permission needed for iOS
   };
+
   const savePDF = async (
     base64String: string,
     file_name: string,
@@ -281,13 +424,13 @@ const Demo = () => {
       } else {
         throw new Error('File not saved');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Save PDF Error:', error);
       Alert.alert('Error', `Failed to save file: ${error.message}`);
       setIsDownloading({fileId: fileId, downloading: false});
     }
   };
-  const checkFileExistace = async (title: string) => {
+  const checkFileExistace = async (title: string): Promise<boolean> => {
     console.log('----chrekcv', title);
     const documentsPath =
       Platform.OS == 'ios'
@@ -296,12 +439,15 @@ const Demo = () => {
     const folderName = 'Myntra';
     const fileName = `${title}.pdf`;
     const folderPath = `${documentsPath}/${folderName}`;
-    const filePath = `${folderPath}/${fileName}`;
+    const filePath =
+      Platform.OS == 'ios'
+        ? `${folderPath}/${fileName}`
+        : `file:///storage/emulated/0/Download/Myntra/${title}.pdf`;
 
     // Check and create folder
     // console.log('filePath', filePath);
     const fileExists = await RNBlobUtil.fs.exists(filePath);
-    if (fileExists) return true;
+    return fileExists;
   };
 
   const readFileContent = async (fileId: string, fileName: string) => {
@@ -385,6 +531,7 @@ const Demo = () => {
   const onClose = () => {
     setViewFile(false);
   };
+
   const ViewFiles = async (title: string) => {
     const documentsPath =
       Platform.OS == 'ios'
@@ -393,8 +540,11 @@ const Demo = () => {
     const folderName = 'Myntra';
     const fileName = `${title}.pdf`;
     const folderPath = `${documentsPath}/${folderName}`;
-    const filePath = `${folderPath}/${fileName}`;
-    // console.log('----', filePath);
+    const filePath =
+      Platform.OS == 'ios'
+        ? `${folderPath}/${fileName}`
+        : `file:///storage/emulated/0/Download/Myntra/${title}.pdf`;
+    console.log('----', filePath);
     // let fileP = {path: filePath, name: title};
     // setFilePath(fileP);
     // setViewFile(true);
@@ -404,6 +554,8 @@ const Demo = () => {
       })
       .catch(error => {
         // error
+        Alert.alert('Error', error.message);
+        console.log('File View Error', error);
       });
   };
   return (
@@ -414,7 +566,7 @@ const Demo = () => {
           <RenderData
             item={item}
             signIn={signIn}
-            getDriveFiles={readFileContent}
+            getDriveFiles={checkPermission}
             progressPercent={progressPercent}
             checkFileExistace={async item => await checkFileExistace(item)}
             viewFile={ViewFiles}
@@ -423,12 +575,12 @@ const Demo = () => {
         )}
         style={{height: '50%'}}
       />
-      <ViewFileModal
+      {/* <ViewFileModal
         isVisible={viewFile}
         onClose={onClose}
         filepath={filepath}
         title=""
-      />
+      /> */}
     </View>
   );
 };
