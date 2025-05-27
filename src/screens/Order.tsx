@@ -19,7 +19,7 @@ export default function Order({route, navigation}: any) {
   const _renderFlatList = ({item, index}: any) => {
     return (
       <View>
-        <Text></Text>
+        <Text>{item}</Text>
       </View>
     );
   };

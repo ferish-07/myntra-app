@@ -1,16 +1,9 @@
-import {
-  Dimensions,
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  FlatList,
-  TouchableOpacity,
-} from 'react-native';
+import {StyleSheet, Text, View, TouchableOpacity} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import SlidingComponent from './Common/SlidingComponent';
 import Header from './Common/Header';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import AddressBar from './AddressBar';
 
 export default function Home({navigation}: any) {
   const [mainCategory, setMainCategory] = useState<any[]>([
@@ -105,8 +98,9 @@ export default function Home({navigation}: any) {
   return (
     <View style={{backgroundColor: 'white', flex: 1}}>
       <View style={{height: 160}}>
-        <Header title="Myntra" isBack={false} isHomePage={true} />
-        <View
+        <AddressBar />
+        {/* <Header title="Myntra" isBack={false} isHomePage={true} /> */}
+        {/* <View
           style={{
             width: '100%',
             marginTop: 5,
@@ -173,8 +167,8 @@ export default function Home({navigation}: any) {
           <TouchableOpacity onPress={() => console.log('--->>.', i2)}>
             <Text>{i2.title}</Text>
           </TouchableOpacity>
-        ))}
-        <SlidingComponent />
+        ))} */}
+        {/* <SlidingComponent /> */}
       </View>
     </View>
   );
